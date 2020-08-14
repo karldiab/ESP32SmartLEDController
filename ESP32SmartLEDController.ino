@@ -1,3 +1,4 @@
+#define DEBUG 1
 #define IR_RECEIVE_PIN 13
 #define LED_PIN    12
 #define MOTION_PIN 27
@@ -17,12 +18,14 @@ volatile bool motionDetected = false;
 volatile unsigned long motionLastDetected = 0;
 volatile unsigned long screenLastUpdated = 0;
 #include "DisplayDriver.h"
-#include "LEDDriver.h"
 #include "IRReceiver.h"
+#include "LEDDriver.h"
 
 
-//Motion detector setup
+//create task to drive LEDs to run on second core
+TaskHandle_t LEDTask;
 
+//Hardware timer setup
 hw_timer_t * myTimer = NULL; 
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
@@ -63,40 +66,27 @@ void setup(void) {
   timerAttachInterrupt(myTimer, &ISR2, true);
   timerAlarmWrite(myTimer, 100000, true);
   timerAlarmEnable(myTimer);
-  
   //for lcd
   setupDisplay();
 
 
-  //for LED controls
-  setupLEDs();
-
   //ir receiver
   irrecv.enableIRIn();  // Start the receiver
+  
+  //for LED controls
+  setupLEDs();
+  xTaskCreatePinnedToCore(
+                    LEDTaskCode,   /* Task function. */
+                    "LEDTask",     /* name of task. */
+                    10000,       /* Stack size of task */
+                    NULL,        /* parameter of the task */
+                    1,           /* priority of the task */
+                    &LEDTask,      /* Task handle to keep track of created task */
+                    0);          /* pin task to core 0 */                  
+  delay(500); 
 }
 void loop() {
   //updateDisplay();
-  //LEDS
-  if (currentDisplayMode == normal) {
-    
-    pulseColor(255,255,255,20);
-    rainbow(10);   
-  } else if (currentDisplayMode == remote) {
-    Serial.println("Tryin to do remote shit");
-//    Serial.print("RGB: ");
-//    Serial.print(color[0]);
-//    Serial.print(" ");
-//    Serial.print(color[1]);
-//    Serial.print(" ");
-//    Serial.println(color[2]);
-  for(int i=0; i<strip.numPixels(); i++) { 
-      strip.setPixelColor(i, strip.Color(color[0], color[1],color[2]));       
-    }
-    strip.show();                          
-    strip.fill(strip.Color(color[0], color[1],color[2]), 0, LED_COUNT);
-    remoteCommandInQueue = false;
-    delay(100);               
-  }
 
     
 //  // Fill along the length of the strip in various colors...

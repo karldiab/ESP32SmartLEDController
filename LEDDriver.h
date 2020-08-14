@@ -7,7 +7,6 @@ void setupLEDs() {
   strip.show();            // Turn OFF all pixels ASAP
   strip.setBrightness(200); // Set BRIGHTNESS to about 1/5 (max = 255)
 }
-
 void pulseColor(int R, int G, int B, int wait) {
   uint32_t colorDimmest = strip.Color(R/32,G/32,B/32);
   uint32_t colorDimmeerer = strip.Color(R/16,G/16,B/16);
@@ -118,3 +117,34 @@ void theaterChaseRainbow(int wait) {
     }
   }
 }
+void LEDTaskCode( void * pvParameters ){
+  Serial.print("LEDTask running on core ");
+  Serial.println(xPortGetCoreID());
+
+  for(;;){
+    if (currentDisplayMode == normal) {
+      
+      pulseColor(255,255,255,20);
+      rainbow(10);   
+    } else if (currentDisplayMode == remote) {
+      #ifdef DEBUG
+        Serial.println("Tryin to do remote shit");  
+        Serial.print("RGB: ");
+        Serial.print(color[0]);
+        Serial.print(" ");
+        Serial.print(color[1]);
+        Serial.print(" ");
+        Serial.println(color[2]);
+      #endif
+    for(int i=0; i<strip.numPixels(); i++) { 
+        strip.setPixelColor(i, strip.Color(color[0], color[1],color[2]));       
+      }
+      strip.show();                          
+      strip.fill(strip.Color(color[0], color[1],color[2]), 0, LED_COUNT);
+      remoteCommandInQueue = false;
+      delay(100);               
+    }
+  } 
+}
+
+
