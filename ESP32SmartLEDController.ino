@@ -1,8 +1,13 @@
 #define DEBUG 1
 #define IR_RECEIVE_PIN 13
-#define LED_PIN    12
 #define MOTION_PIN 27
+//LED Strip driver definitions
+#define LED_TYPE    WS2811
+#define COLOR_ORDER RGB
 #define LED_COUNT 100
+#define LED_PIN    12
+#define BRIGHTNESS          96
+#define FRAMES_PER_SECOND  120
 
 //global variables to keep track of settings
 enum displayMode {
