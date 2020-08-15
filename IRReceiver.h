@@ -5,12 +5,6 @@
 IRrecv irrecv(IR_RECEIVE_PIN);
 decode_results results;        // Somewhere to store the results
 void decodeIRCommand(unsigned int value);
-#define MAX_BRIGHTNESS_VALUE 16
-int brightness = 8; //value that ranges from 0 to 15
-int color[3] = {255,255,255}; //RGB values from 
-bool systemOn = true;
-bool remoteCommandInQueue = false;
-
 
 #define button_brightnessUp 16187647
 #define button_brightnessDown 16220287
@@ -37,138 +31,176 @@ bool remoteCommandInQueue = false;
 #define button_pink 16214167
 #define button_smooth 16246807
 
-void turnOff() {
-      systemOn = false;
-      color[0] = 0;
-      color[1] = 0;
-      color[2] = 0;
+void toggleDisplayMode() {
+   switch (currentDisplayMode) {
+      case normal:
+        previousDisplayMode = currentDisplayMode; 
+        currentDisplayMode = single; 
+      break;
+      case single:
+        previousDisplayMode = currentDisplayMode; 
+        currentDisplayMode = normal; 
+      break;
+      default:
+        previousDisplayMode = currentDisplayMode; 
+        currentDisplayMode = normal; 
+      break;
+    }
 }
 
 //ir receiver decode functions
 void decodeIRCommand(unsigned int value) {
   switch (value) {
     case button_off:
-      turnOff();
-      systemOn = false;
-      color[0] = 0;
-      color[1] = 0;
-      color[2] = 0;
+      if (currentDisplayMode != off) { 
+        previousDisplayMode = currentDisplayMode; 
+        currentDisplayMode = off; 
+      }
     break;
     case button_on:
-      systemOn = true;
+      if (currentDisplayMode == off) { 
+        currentDisplayMode = previousDisplayMode; 
+      }
+    break;
+    //repurposed this button to change mode
+    case button_flash:
+      toggleDisplayMode();
+    break;
+    //repurposed this skip to next routine
+    case button_strobe:
+      nextPattern();
+    break;
+    //repurposed this button to go to previous routine
+    case button_fade:
+      previousPattern();
     break;
     case button_red:
-      systemOn = true;
+
       color[0] = 255;
       color[1] = 0;
       color[2] = 0;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_green:
-      systemOn = true;
+
       color[0] = 0;
       color[1] = 255;
       color[2] = 0;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_blue:
-      systemOn = true;
+      
       color[0] = 0;
       color[1] = 0;
       color[2] = 255;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_white:
-      systemOn = true;
+      
       color[0] = 255;
       color[1] = 255;
       color[2] = 255;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_brightnessUp:
-      systemOn = true;
+      
       if (brightness < MAX_BRIGHTNESS_VALUE)
         brightness++;
+      changeBrightness();
+      
     break;
     case button_brightnessDown:
-      systemOn = true;
+      
       if (brightness > 0)
         brightness--;
+      changeBrightness();
     break;
     case button_orange:
-      systemOn = true;
+      
       color[0] = 255;
       color[1] = 60;
       color[2] = 0;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_aquamarine:
-      systemOn = true;
+      
       color[0] = 32;
       color[1] = 210;
       color[2] = 137;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_navy:
-      systemOn = true;
+      
       color[0] = 0;
       color[1] = 0;
       color[2] = 128;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_darkOrange:
-      systemOn = true;
+      
       color[0] = 255;
       color[1] = 45;
       color[2] = 0;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_turquoise:
-      systemOn = true;
+      
       color[0] = 64;
       color[1] = 224;
       color[2] = 208;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_darkPurple:
-      systemOn = true;
+      
       color[0] = 128;
       color[1] = 0;
       color[2] = 128;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_brightOrange:
-      systemOn = true;
+      
       color[0] = 255;
       color[1] = 100;
       color[2] = 0;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_mediumTurquoise:
-      systemOn = true;
+      
       color[0] = 72;
       color[1] = 209;
       color[2] = 204;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_purple:
-      systemOn = true;
+      
       color[0] = 128;
       color[1] = 0;
       color[2] = 156;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_yellow:
-      systemOn = true;
+      
       color[0] = 255;
       color[1] = 165;
       color[2] = 0;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_darkTurquoise:
-      systemOn = true;
+      
       color[0] = 0;
       color[1] = 206;
       color[2] = 209;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_pink:
-      systemOn = true;
+      
       color[0] = 255;
       color[1] = 20;
       color[2] = 147;
+      if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     default:
-      Serial.println("I dunno wut dat is");
       return;
     break;
   }
-  Serial.println("Yayyy I understood that");
-  remoteCommandInQueue = true;
-  currentDisplayMode = remote;
 }

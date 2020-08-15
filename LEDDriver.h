@@ -11,11 +11,24 @@ uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 #include "LEDRoutines.h"
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
+SimplePatternList gPatterns = { pride, rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
+String routineNames[] = { "Pride", "Rainbow", "GLTR Rainbow", "Confetti", "Sinelon", "Juggle", "BPM" };
 void nextPattern()
 {
+  #ifdef DEBUG2
+    Serial.println("nextPattern() called");
+  #endif
   // add one to the current pattern number, and wrap around at the end
   gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
+}
+void previousPattern()
+{
+
+  // subtract one to the current pattern number, and wrap around at the end
+  gCurrentPatternNumber = (gCurrentPatternNumber - 1) < 0 ? ARRAY_SIZE( gPatterns) - 1 : gCurrentPatternNumber - 1;
+}
+uint8_t getCurrentPatternNumber() {
+  return gCurrentPatternNumber;
 }
 
 void LEDTaskCode( void * pvParameters ){
@@ -23,79 +36,57 @@ void LEDTaskCode( void * pvParameters ){
   Serial.println(xPortGetCoreID());
 
   for(;;){
-    if (currentDisplayMode == normal) {
-      // Call the current pattern function once, updating the 'leds' array
-      gPatterns[gCurrentPatternNumber]();
-    
-      // send the 'leds' array out to the actual LED strip
-      FastLED.show();  
-      // insert a delay to keep the framerate modest
-      FastLED.delay(1000/FRAMES_PER_SECOND); 
-    
-      // do some periodic updates
-      EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
-      EVERY_N_SECONDS( 10 ) { nextPattern(); } // change patterns periodically
-//      #ifdef DEBUG
-//        Serial.println("Running juggle routine");
-//      #endif
-//      juggle();
-//      FastLED.show();  
-//      // insert a delay to keep the framerate modest
-//      FastLED.delay(1000/FRAMES_PER_SECOND); 
-//      #ifdef DEBUG
-//        Serial.println("Running bpm routine");
-//      #endif
-//      bpm();
-//      FastLED.show();  
-//      // insert a delay to keep the framerate modest
-//      FastLED.delay(1000/FRAMES_PER_SECOND); 
-//      #ifdef DEBUG
-//        Serial.println("Running sinelon routine");
-//      #endif
-//      sinelon();
-//      FastLED.show();  
-//      // insert a delay to keep the framerate modest
-//      FastLED.delay(1000/FRAMES_PER_SECOND); 
-//      #ifdef DEBUG
-//        Serial.println("Running confetti routine");
-//      #endif
-//      confetti();
-//      FastLED.show();  
-//      // insert a delay to keep the framerate modest
-//      FastLED.delay(1000/FRAMES_PER_SECOND); 
-//      #ifdef DEBUG
-//        Serial.println("Running rainbowWithGlitter routine");
-//      #endif
-//      rainbowWithGlitter();
-//      FastLED.show();  
-//      // insert a delay to keep the framerate modest
-//      FastLED.delay(1000/FRAMES_PER_SECOND); 
-//      #ifdef DEBUG
-//        Serial.println("Running rainbow routine");
-//      #endif
-//      rainbow();
-//      FastLED.show();  
-//      // insert a delay to keep the framerate modest
-//      FastLED.delay(1000/FRAMES_PER_SECOND); 
+    switch (currentDisplayMode) {
+      case normal:
+        // Call the current pattern function once, updating the 'leds' array
+        gPatterns[gCurrentPatternNumber]();
       
-    } else if (currentDisplayMode == remote) {
-      #ifdef DEBUG
-        Serial.println("Tryin to do remote shit");  
-        Serial.print("RGB: ");
-        Serial.print(color[0]);
-        Serial.print(" ");
-        Serial.print(color[1]);
-        Serial.print(" ");
-        Serial.println(color[2]);
-      #endif
-    for(int i=0; i<LED_COUNT; i++) { 
-        //strip.setPixelColor(i, strip.Color(color[0], color[1],color[2]));       
-      }
-      //strip.show();                          
-      //strip.fill(strip.Color(color[0], color[1],color[2]), 0, LED_COUNT);
-      remoteCommandInQueue = false;
-      delay(100);               
+        // send the 'leds' array out to the actual LED strip
+        FastLED.show();  
+        // insert a delay to keep the framerate modest
+        FastLED.delay(1000/FRAMES_PER_SECOND); 
+      
+        // do some periodic updates
+        EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
+        EVERY_N_SECONDS( ROUTINE_CYCLE_TIME_S ) { nextPattern(); } // change patterns periodically
+      break;
+      case remote:
+        #ifdef DEBUG3
+          Serial.println("Tryin to do remote shit");  
+          Serial.print("RGB: ");
+          Serial.print(color[0]);
+          Serial.print(" ");
+          Serial.print(color[1]);
+          Serial.print(" ");
+          Serial.println(color[2]);
+        #endif
+        for(int i=0; i<LED_COUNT; i++) { 
+          leds[i].setRGB(color[0],color[1],color[2]);
+        }
+        FastLED.show();                       
+        delay(50); 
+      break;
+      case off:
+        for(int i=0; i<LED_COUNT; i++) { 
+          leds[i].setRGB(0,0,0);
+        }
+        FastLED.show();                       
+        delay(50); 
+      break;
+      case single:
+        // Call the current pattern function once, updating the 'leds' array
+        gPatterns[gCurrentPatternNumber]();
+      
+        // send the 'leds' array out to the actual LED strip
+        FastLED.show();  
+        // insert a delay to keep the framerate modest
+        FastLED.delay(1000/FRAMES_PER_SECOND); 
+      
+        // do some periodic updates
+        EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rai
+      break;
     }
+
   } 
 }
 
@@ -107,6 +98,10 @@ void setupLEDs() {
   //FastLED.addLeds<LED_TYPE,LED_PIN,CLK_PIN,COLOR_ORDER>(leds, LED_COUNT).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
-  FastLED.setBrightness(BRIGHTNESS);
+  FastLED.setBrightness(map(brightness, 0,10,0,255));
+}
+
+void changeBrightness() {
+  FastLED.setBrightness(map(brightness, 0,10,0,255));
 }
 
