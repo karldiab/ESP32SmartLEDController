@@ -5,7 +5,7 @@
 //LED Strip driver definitions
 #define LED_TYPE    WS2811
 #define COLOR_ORDER BRG
-#define LED_COUNT 63
+#define LED_COUNT 108
 #define LED_PIN    12
 #define FRAMES_PER_SECOND  120
 #define MAX_BRIGHTNESS_VALUE 10

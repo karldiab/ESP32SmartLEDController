@@ -2,7 +2,6 @@
 #include "SPI.h"
 #include "TFT_eSPI.h"
 // The custom font file attached to this sketch must be included
-#include "MyFont.h"
 #include "NotoSansBold15.h"
 #include "NotoSansBold36.h"
 #include "NotoSans24.h"
