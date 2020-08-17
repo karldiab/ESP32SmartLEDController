@@ -4,6 +4,10 @@
 FASTLED_USING_NAMESPACE
 CRGB leds[LED_COUNT];
 
+#define S_NIGHT_MODE_STAY_ON 120
+bool motionDetectBeingHandled = false;
+bool carpetDoneUnroll = false;
+bool carpetDoneRollup = false;
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 
@@ -12,10 +16,10 @@ uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 #include "CustomLEDRoutines.h"
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { pulseStairs, pride, rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm, twinkle, runRainbow };
-String routineNames[] = { "Pulse Stairs", "Pride", "Rainbow", "GLTR Rainbow", "Confetti", "Sinelon", "Juggle", "BPM", "Twinkle", "Step Rainbow" };
-//SimplePatternList gPatterns = { pulseStairs };
-//String routineNames[] = { "pulseStairs" };
+SimplePatternList gPatterns = { pulseStairs, pride, rainbow, redCarpetLoop, rainbowWithGlitter, confetti, sinelon, juggle, bpm, twinkle, runRainbow };
+String routineNames[] = { "Pulse Stairs", "Pride", "Rainbow", "Red Carpet", "GLTR Rainbow", "Confetti", "Sinelon", "Juggle", "BPM", "Twinkle", "Step Rainbow" };
+//SimplePatternList gPatterns = {   pulseStairs, pride, rainbow };
+//String routineNames[] = { "Pulse Stairs", "Pride", "Rainbow" };
 void nextPattern()
 {
   #ifdef DEBUG2
@@ -92,6 +96,30 @@ void LEDTaskCode( void * pvParameters ){
           chooseNextColorPalette( gTargetPalette ); // for twinkle 
         }
       break;
+//      case night:
+//      //if new motion detected
+//        if (motionDetected && !motionDetectBeingHandled) {
+//          carpetDoneUnroll = false;
+//          carpetDoneRollUp = false;
+//          redCarpetFrameNumber = 0;
+//          redCarpetStairNumber = 0;
+//          motionDetectBeingHandled = true;
+//        }
+//        if (motionDetectBeingHandled) {
+//          if (!carpetDoneUnroll) {
+//            if (redCarpetUnroll()) {
+//              carpetDoneUnroll = true;
+//              FastLED.delay(1000*S_NIGHT_MODE_STAY_ON);
+//            }
+//          }
+//          if (!carpetDoneRollup) {
+//            if (redCarpetRollup()) {
+//              carpetDoneRollup = true;
+//              motionDetectBeingHandled = false;
+//            }
+//          }
+//        }
+//      break;
     }
 
   } 

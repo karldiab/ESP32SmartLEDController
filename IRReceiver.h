@@ -41,6 +41,10 @@ void toggleDisplayMode() {
         previousDisplayMode = currentDisplayMode; 
         currentDisplayMode = normal; 
       break;
+//      case night:
+//        previousDisplayMode = currentDisplayMode; 
+//        currentDisplayMode = normal; 
+//      break;
       default:
         previousDisplayMode = currentDisplayMode; 
         currentDisplayMode = normal; 

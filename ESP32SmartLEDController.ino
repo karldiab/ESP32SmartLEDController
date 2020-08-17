@@ -1,5 +1,6 @@
 #define DEBUG 1
 #define DEBUG2 1
+#define DEBUG3 1
 //#define DEBUG5 1
 #define IR_RECEIVE_PIN 13
 #define MOTION_PIN 27
@@ -27,6 +28,9 @@ displayMode previousDisplayMode = normal;
 volatile bool motionDetected = false;
 volatile unsigned long motionLastDetected = 0;
 volatile unsigned long screenLastUpdated = 0;
+//volatile bool motionDetectBeingHandled = false;
+//volatile bool carpetDoneUnroll = false;
+//volatile bool carpetDoneRollup = false;
 //brightness is a value from 0 to 10
 volatile byte brightness = 10;
 //array to store solid color to display on LEDs as commanded by the ir remote

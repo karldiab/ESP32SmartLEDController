@@ -58,7 +58,8 @@ void runRainbow() {
 int pulseStairsFrameNumber = 0;
 #define PULSE_STAIRS_TOTAL_FRAMES 255
 #define PULSE_STAIRS_WAVE_WIDTH 6
-double calculateCosWaveformFactor(int ledNo, int wavePosition, int stair);
+//double calculateCosWaveformFactor(int ledNo, int wavePosition, int stair);
+double calculateCosWaveformFactor(int ledNo, int wavePosition, int frameNumber, int totalFrames, int waveWidth, int stair);
 double mapf(double x, double in_min, double in_max, double out_min, double out_max);
 //lights up all the stairs at the same time by pulsing out light from the center
 void pulseStairs() {
@@ -89,7 +90,7 @@ void pulseStairs() {
 
         //int ledBrightness = 
         //double brightnessFactor = mapf(color
-        double brightnessFactor = calculateCosWaveformFactor(led,wavePosition, stair);
+        double brightnessFactor = calculateCosWaveformFactor(led,wavePosition, pulseStairsFrameNumber, PULSE_STAIRS_TOTAL_FRAMES, PULSE_STAIRS_WAVE_WIDTH, stair);
         leds[myLEDIndex].setRGB((int)((double)color[0]*brightnessFactor+0.5),(int)((double)color[1]*brightnessFactor+0.5),(int)((double)color[2]*brightnessFactor+0.5)); 
       #ifdef DEBUG5
         if (stair == 1 || stair == 0) {
@@ -119,10 +120,10 @@ void pulseStairs() {
   pulseStairsFrameNumber++;
 }
 
-double calculateCosWaveformFactor(int ledNo, int wavePosition, int stair) {
-  double waveProgress = (double)pulseStairsFrameNumber/PULSE_STAIRS_TOTAL_FRAMES;
-  double waveProgressLEDNo = mapf(waveProgress, 0,1,(double)stairs[stair].firstIndex-PULSE_STAIRS_WAVE_WIDTH,stairs[stair].lastIndex);
-  double ledCosInput = mapf((double)ledNo, waveProgressLEDNo, waveProgressLEDNo+PULSE_STAIRS_WAVE_WIDTH,(double)-128,(double)128);
+double calculateCosWaveformFactor(int ledNo, int wavePosition, int frameNumber, int totalFrames, int waveWidth, int stair) {
+  double waveProgress = (double)frameNumber/totalFrames;
+  double waveProgressLEDNo = mapf(waveProgress, 0,1,(double)stairs[stair].firstIndex-waveWidth,stairs[stair].lastIndex);
+  double ledCosInput = mapf((double)ledNo, waveProgressLEDNo, waveProgressLEDNo+waveWidth,(double)-128,(double)128);
   int ledCosValue = cos8((int)(ledCosInput+0.5));
   #ifdef DEBUG6
     if (stair == 0) {
@@ -142,6 +143,178 @@ double calculateCosWaveformFactor(int ledNo, int wavePosition, int stair) {
 }
 
 //end of pulse stairs
+
+//red carpet
+int redCarpetFrameNumber = 0;
+int redCarpetStairNumber = 0;
+bool reverseDirection = false;
+#define RED_CARPET_TOTAL_FRAMES 128
+#define RED_CARPET_WAVE_WIDTH 12
+void redCarpetLoop() {
+  int wavePosition;
+  if (redCarpetStairNumber == 0 && redCarpetFrameNumber == 0) {
+    for(int i=0; i<LED_COUNT; i++) { 
+      leds[i].setRGB(0,0,0);
+    }
+  }
+  if (redCarpetFrameNumber > RED_CARPET_TOTAL_FRAMES) {
+    redCarpetFrameNumber = 0;
+    if (!reverseDirection) {
+      redCarpetStairNumber++;
+    } else {
+      redCarpetStairNumber--;
+    }
+    
+  }
+  if (redCarpetStairNumber >= NUMBER_OF_STAIRS && !reverseDirection) {
+    redCarpetStairNumber -= 1;
+    reverseDirection = !reverseDirection;
+  }
+  if (redCarpetStairNumber < 0 && reverseDirection) {
+    redCarpetStairNumber = 0;
+    reverseDirection = !reverseDirection;
+  }
+  #ifdef DEBUG5
+    Serial.print("redCarpetStairNumber: ");
+    Serial.print(redCarpetStairNumber);
+    Serial.print(" Frame number: ");
+    Serial.println(redCarpetFrameNumber);
+  #endif
+  int stair = redCarpetStairNumber;
+  //calculate where the start of the wave should
+  wavePosition = map(redCarpetFrameNumber, 0, RED_CARPET_TOTAL_FRAMES, stairs[stair].firstIndex-RED_CARPET_WAVE_WIDTH,stairs[stair].lastIndex);
+  double waveProgress = (double)redCarpetFrameNumber/RED_CARPET_TOTAL_FRAMES;
+  //wavePosition = getWavePosition();
+  #ifdef DEBUG5
+    if (stair == 0) {
+      Serial.print("wavePosition: ");
+      Serial.println(wavePosition);
+    }
+
+  #endif
+  for (int led = stairs[stair].firstIndex; led <= stairs[stair].lastIndex; led++) {
+    //check if this LED is one of the ones that should be illuminated
+    if (reverseDirection) {
+      if (led >= wavePosition +1 && led < wavePosition + RED_CARPET_WAVE_WIDTH/2 + 3) {
+        double brightnessFactor = calculateCosWaveformFactor(led,wavePosition, redCarpetFrameNumber, RED_CARPET_TOTAL_FRAMES, RED_CARPET_WAVE_WIDTH, stair);
+        leds[led].setRGB((int)((double)color[0]*brightnessFactor+0.5),(int)((double)color[1]*brightnessFactor+0.5),(int)((double)color[2]*brightnessFactor+0.5)); 
+      }
+      if (led < wavePosition) {
+        leds[led].setRGB(0,0,0);
+      }
+    } else {
+      if (led >= wavePosition +1 + RED_CARPET_WAVE_WIDTH/2 && led < wavePosition + RED_CARPET_WAVE_WIDTH + 1) {
+        double brightnessFactor = calculateCosWaveformFactor(led,wavePosition, redCarpetFrameNumber, RED_CARPET_TOTAL_FRAMES, RED_CARPET_WAVE_WIDTH, stair);
+        leds[led].setRGB((int)((double)color[0]*brightnessFactor+0.5),(int)((double)color[1]*brightnessFactor+0.5),(int)((double)color[2]*brightnessFactor+0.5)); 
+      }
+    }
+  }
+  
+  #ifdef DEBUG5
+  
+    Serial.println();
+  #endif
+  redCarpetFrameNumber++;
+}
+//return true if done
+bool redCarpetUnroll() {
+  int wavePosition;
+  if (redCarpetStairNumber == 0 && redCarpetFrameNumber == 0) {
+    for(int i=0; i<LED_COUNT; i++) { 
+      leds[i].setRGB(0,0,0);
+    }
+  }
+  if (redCarpetFrameNumber > RED_CARPET_TOTAL_FRAMES) {
+    redCarpetFrameNumber = 0;
+    redCarpetStairNumber++;
+    
+  }
+  if (redCarpetStairNumber >= NUMBER_OF_STAIRS) {
+    return true;
+  }
+  #ifdef DEBUG5
+    Serial.print("redCarpetStairNumber: ");
+    Serial.print(redCarpetStairNumber);
+    Serial.print(" Frame number: ");
+    Serial.println(redCarpetFrameNumber);
+  #endif
+  int stair = redCarpetStairNumber;
+  //calculate where the start of the wave should
+  wavePosition = map(redCarpetFrameNumber, 0, RED_CARPET_TOTAL_FRAMES, stairs[stair].firstIndex-RED_CARPET_WAVE_WIDTH,stairs[stair].lastIndex);
+  double waveProgress = (double)redCarpetFrameNumber/RED_CARPET_TOTAL_FRAMES;
+  //wavePosition = getWavePosition();
+  #ifdef DEBUG5
+    if (stair == 0) {
+      Serial.print("wavePosition: ");
+      Serial.println(wavePosition);
+    }
+
+  #endif
+  for (int led = stairs[stair].firstIndex; led <= stairs[stair].lastIndex; led++) {
+    //check if this LED is one of the ones that should be illuminated
+    if (led >= wavePosition +1 + RED_CARPET_WAVE_WIDTH/2 && led < wavePosition + RED_CARPET_WAVE_WIDTH + 1) {
+      double brightnessFactor = calculateCosWaveformFactor(led,wavePosition, redCarpetFrameNumber, RED_CARPET_TOTAL_FRAMES, RED_CARPET_WAVE_WIDTH, stair);
+      leds[led].setRGB((int)((double)color[0]*brightnessFactor+0.5),(int)((double)color[1]*brightnessFactor+0.5),(int)((double)color[2]*brightnessFactor+0.5)); 
+    }
+    
+  }
+  
+  #ifdef DEBUG5
+  
+    Serial.println();
+  #endif
+  redCarpetFrameNumber++;
+  return false;
+}
+//return true if done
+bool redCarpetRollUp() {
+  int wavePosition;
+  if (redCarpetFrameNumber > RED_CARPET_TOTAL_FRAMES) {
+    redCarpetFrameNumber = 0;
+    redCarpetStairNumber--;
+    
+  }
+  if (redCarpetStairNumber < 0) {
+    return true;
+  }
+  #ifdef DEBUG5
+    Serial.print("redCarpetStairNumber: ");
+    Serial.print(redCarpetStairNumber);
+    Serial.print(" Frame number: ");
+    Serial.println(redCarpetFrameNumber);
+  #endif
+  int stair = redCarpetStairNumber;
+  //calculate where the start of the wave should
+  wavePosition = map(redCarpetFrameNumber, 0, RED_CARPET_TOTAL_FRAMES, stairs[stair].firstIndex-RED_CARPET_WAVE_WIDTH,stairs[stair].lastIndex);
+  double waveProgress = (double)redCarpetFrameNumber/RED_CARPET_TOTAL_FRAMES;
+  //wavePosition = getWavePosition();
+  #ifdef DEBUG5
+    if (stair == 0) {
+      Serial.print("wavePosition: ");
+      Serial.println(wavePosition);
+    }
+
+  #endif
+  for (int led = stairs[stair].firstIndex; led <= stairs[stair].lastIndex; led++) {
+    if (led >= wavePosition +1 && led < wavePosition + RED_CARPET_WAVE_WIDTH/2 + 3) {
+      double brightnessFactor = calculateCosWaveformFactor(led,wavePosition, redCarpetFrameNumber, RED_CARPET_TOTAL_FRAMES, RED_CARPET_WAVE_WIDTH, stair);
+      leds[led].setRGB((int)((double)color[0]*brightnessFactor+0.5),(int)((double)color[1]*brightnessFactor+0.5),(int)((double)color[2]*brightnessFactor+0.5)); 
+    }
+    if (led < wavePosition) {
+      leds[led].setRGB(0,0,0);
+    }
+  }
+  
+  #ifdef DEBUG5
+  
+    Serial.println();
+  #endif
+  redCarpetFrameNumber++;
+  return false;
+}
+
+
+//end of red carpet
 
 //global variables for stairID
 unsigned long stairIDLastFrame = 0;
