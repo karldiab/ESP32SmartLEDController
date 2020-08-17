@@ -22,6 +22,39 @@ const staircaseStep  stairs[NUMBER_OF_STAIRS] PROGMEM = {
   {95,106,false}
 };
 
+
+#define RUN_RAINBOW_TOTAL_FRAMES 1200
+const byte rainbowColors[7][3] PROGMEM = {
+  {255,0,0},{255,127,0},{255,255,0},{0,255,0},{0,0,255},{75,0,130},{148,0,211}
+};
+const byte rainbowColorsReverse[7][3] PROGMEM = {
+  {148,0,211},{75,0,130},{0,0,255},{0,255,0},{255,255,0},{255,127,0},{255,0,0}
+};
+int runRainbowFrameNumber = 0;
+void runRainbow() {
+  if (runRainbowFrameNumber > RUN_RAINBOW_TOTAL_FRAMES) {
+    runRainbowFrameNumber = 0;
+  }
+  int stepNo = 0;
+  //int stepNo = runRainbowFrameNumber/(RUN_RAINBOW_TOTAL_FRAMES/NUMBER_OF_STAIRS);
+  for (int stair = 0; stair < NUMBER_OF_STAIRS; stair++) { 
+    int rainbowIndex = (stair+stepNo)%7;
+    #ifdef DEBUG5
+      Serial.print("Stairno: ");
+      Serial.print(stair);
+      Serial.print(" rainbowindex: ");
+      Serial.println(rainbowIndex);
+    #endif
+    for (int led = stairs[stair].firstIndex; led <= stairs[stair].lastIndex; led++) {
+      leds[led].setRGB(rainbowColors[(stair+stepNo)%7][0],rainbowColors[(stair+stepNo)%7][1],rainbowColors[(stair+stepNo)%7][2]);
+    }
+  }
+  #ifdef DEBUG5
+    Serial.println();
+  #endif
+  runRainbowFrameNumber++;
+}
+
 //pulse stairs
 //int pulseStairsFrameNumber = 0;
 //#define PULSE_STAIRS_TOTAL_FRAMES 255

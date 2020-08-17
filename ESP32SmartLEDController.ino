@@ -1,6 +1,6 @@
 #define DEBUG 1
 #define DEBUG2 1
-#define DEBUG5 1
+//#define DEBUG5 1
 #define IR_RECEIVE_PIN 13
 #define MOTION_PIN 27
 //LED Strip driver definitions
