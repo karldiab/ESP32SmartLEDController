@@ -35,8 +35,7 @@ void runRainbow() {
   if (runRainbowFrameNumber > RUN_RAINBOW_TOTAL_FRAMES) {
     runRainbowFrameNumber = 0;
   }
-  int stepNo = 0;
-  //int stepNo = runRainbowFrameNumber/(RUN_RAINBOW_TOTAL_FRAMES/NUMBER_OF_STAIRS);
+  int stepNo = runRainbowFrameNumber/(RUN_RAINBOW_TOTAL_FRAMES/NUMBER_OF_STAIRS);
   for (int stair = 0; stair < NUMBER_OF_STAIRS; stair++) { 
     int rainbowIndex = (stair+stepNo)%7;
     #ifdef DEBUG5
