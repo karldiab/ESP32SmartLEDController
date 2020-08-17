@@ -5,12 +5,12 @@
 
  // progmem variables to organize my own LED layout
 struct staircaseStep {
-  uint8_t firstIndex; //first index, inclusive
-  uint8_t lastIndex; //last index, inclusive
+  int firstIndex; //first index, inclusive
+  int lastIndex; //last index, inclusive
   bool orderReversed; //do the leds run backwards?
 };
-#define NUMBER_OF_STEPS 9
-const staircaseStep  stairs[NUMBER_OF_STEPS] PROGMEM = {
+#define NUMBER_OF_STAIRS 9
+const staircaseStep  stairs[NUMBER_OF_STAIRS] PROGMEM = {
   {0,10,false},
   {11,22,true},
   {23,34,false},
@@ -22,6 +22,79 @@ const staircaseStep  stairs[NUMBER_OF_STEPS] PROGMEM = {
   {95,106,false}
 };
 
+//pulse stairs
+int pulseStairsFrameNumber = 0;
+#define PULSE_STAIRS_TOTAL_FRAMES 255
+#define PULSE_STAIRS_WAVE_WIDTH 15
+int calculateWaveformBrightness(int input, int ledNo, int wavePosition, int waveWidth, int stair);
+//lights up all the stairs at the same time by pulsing out light from the center
+void pulseStairs() {
+  int wavePosition;
+  if (pulseStairsFrameNumber > PULSE_STAIRS_TOTAL_FRAMES) {
+    pulseStairsFrameNumber = 0;
+  }
+  #ifdef DEBUG5
+    Serial.print("Frame number: ");
+    Serial.println(pulseStairsFrameNumber);
+  #endif
+  for (int stair = 0; stair < NUMBER_OF_STAIRS; stair++) {
+    if (!stairs[stair].orderReversed) {
+      //calculate where the start of the wave should
+      wavePosition = map(pulseStairsFrameNumber, 0, PULSE_STAIRS_TOTAL_FRAMES, stairs[stair].firstIndex-PULSE_STAIRS_WAVE_WIDTH,stairs[stair].lastIndex);
+      #ifdef DEBUG5
+        if (stair == 0) {
+          Serial.print("wavePosition: ");
+          Serial.println(wavePosition);
+        }
+
+      #endif
+      for (int led = stairs[stair].firstIndex; led <= stairs[stair].lastIndex; led++) {
+        //check if this LED is one of the ones that should be illuminated
+        if (led >= wavePosition && led < wavePosition + PULSE_STAIRS_WAVE_WIDTH) {
+          int colorZeroBrightness = calculateWaveformBrightness(color[0],led,wavePosition,PULSE_STAIRS_WAVE_WIDTH, stair);
+          leds[led].setRGB(colorZeroBrightness,
+            calculateWaveformBrightness(color[1],led,wavePosition,PULSE_STAIRS_WAVE_WIDTH, stair),
+            calculateWaveformBrightness(color[2],led,wavePosition,PULSE_STAIRS_WAVE_WIDTH, stair));
+        #ifdef DEBUG5
+          if (stair == 0) {
+            Serial.print("led: ");
+            Serial.print(led);
+            Serial.print(" wavePosition: ");
+            Serial.print(wavePosition);
+            Serial.print(" brightness: ");
+            Serial.println(colorZeroBrightness);
+          }
+        #endif
+        } else {
+          //if its not, set to black;
+          leds[led].setRGB(0,0,0);
+        }
+      }
+    }
+  }
+  
+  #ifdef DEBUG5
+  
+    Serial.println();
+  #endif
+  pulseStairsFrameNumber++;
+}
+//calculates waveform brightness by multiplying input (0-255) with the cos value (half wave mapped to -1/2pi to 1/2pi) of the specific leds position in the wave using the wave description input params
+int calculateWaveformBrightness(int input, int ledNo, int wavePosition, int waveWidth, int stair) {
+  int mapValue =map(ledNo, wavePosition, wavePosition + waveWidth - 1,-128,128);
+  int cosValue = cos8(mapValue);
+  #ifdef DEBUG5
+    if (stair == 0) {
+      Serial.print("mapValue: ");
+      Serial.print(mapValue);
+      Serial.print(" cosValue: ");
+      Serial.println(cosValue);
+    }
+  #endif
+  double factor = (double)cosValue/255.0;
+  return (int)((input * factor)+0.5);
+}
+//end of pulse stairs
 
 //global variables for stairID
 unsigned long stairIDLastFrame = 0;
@@ -32,8 +105,8 @@ void stairID() {
   if ((millis() - stairIDLastFrame) > secondsPerStair*1000) {
     stairIDLastFrame = millis();
     Serial.print("Showing stair number ");
-    if (stairIDLastStair >= NUMBER_OF_STEPS) {
-      for (int i = stairs[NUMBER_OF_STEPS-1].firstIndex; i <= stairs[NUMBER_OF_STEPS-1].lastIndex; i++) {
+    if (stairIDLastStair >= NUMBER_OF_STAIRS) {
+      for (int i = stairs[NUMBER_OF_STAIRS-1].firstIndex; i <= stairs[NUMBER_OF_STAIRS-1].lastIndex; i++) {
         leds[i].setRGB(0,0,0);
       }
       
@@ -51,3 +124,6 @@ void stairID() {
     stairIDLastStair++;  
   }
 }
+
+
+

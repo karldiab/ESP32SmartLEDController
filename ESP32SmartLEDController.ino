@@ -1,6 +1,6 @@
 #define DEBUG 1
-//#define DEBUG2 1
-#define DEBUG4 1
+#define DEBUG2 1
+#define DEBUG5 1
 #define IR_RECEIVE_PIN 13
 #define MOTION_PIN 27
 //LED Strip driver definitions
@@ -95,6 +95,7 @@ void setup(void) {
                     0);          /* pin task to core 0 */                  
   delay(100); 
 }
+int counter = 0;
 void loop() {
   //update display if its been long enough
   if ((millis() - screenLastUpdated) > 250) {

@@ -185,7 +185,7 @@ void twinkle()
       (gCurrentPalette[0] == gCurrentPalette[1] )) {
     bg = gCurrentPalette[0];
     uint8_t bglight = bg.getAverageLight();
-    #ifdef DEBUG
+    #ifdef DEBUG5
       Serial.print("bglight: ");
       Serial.println(bglight);
     #endif
@@ -197,7 +197,7 @@ void twinkle()
       bg.nscale8_video( 86); // dim, scale to 1/3rd.
     }
   } else {
-    #ifdef DEBUG2
+    #ifdef DEBUG5
       Serial.println("using explicit background color");
 
     #endif
@@ -209,7 +209,7 @@ void twinkle()
   int pixelNo = 0;
   #endif
   for( CRGB& pixel: leds) {
-     #ifdef DEBUG2
+     #ifdef DEBUG5
       Serial.print("pixel no ");
       Serial.println(pixelNo++);
 

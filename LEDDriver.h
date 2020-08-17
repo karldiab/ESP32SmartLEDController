@@ -12,10 +12,10 @@ uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 #include "CustomLEDRoutines.h"
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { twinkle, pride, rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
-String routineNames[] = { "Twinkle", "Pride", "Rainbow", "GLTR Rainbow", "Confetti", "Sinelon", "Juggle", "BPM" };
-//SimplePatternList gPatterns = { twinkle };
-//String routineNames[] = { "Twinkle" };
+//SimplePatternList gPatterns = { twinkle, pride, rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
+//String routineNames[] = { "Twinkle", "Pride", "Rainbow", "GLTR Rainbow", "Confetti", "Sinelon", "Juggle", "BPM" };
+SimplePatternList gPatterns = { pulseStairs };
+String routineNames[] = { "pulseStairs" };
 void nextPattern()
 {
   #ifdef DEBUG2
