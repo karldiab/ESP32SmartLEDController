@@ -10,16 +10,21 @@ bool carpetDoneUnroll = false;
 bool carpetDoneRollup = false;
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
+uint8_t randomHue = random(256);
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 #include "GenericLEDRoutines.h"
 #include "CustomLEDRoutines.h"
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { pulseStairs, pride, rainbow, redCarpetLoop, rainbowWithGlitter, confetti, sinelon, juggle, bpm, twinkle, runRainbow };
-String routineNames[] = { "Pulse Stairs", "Pride", "Rainbow", "Red Carpet", "GLTR Rainbow", "Confetti", "Sinelon", "Juggle", "BPM", "Twinkle", "Step Rainbow" };
-//SimplePatternList gPatterns = {   pulseStairs, pride, rainbow };
-//String routineNames[] = { "Pulse Stairs", "Pride", "Rainbow" };
+SimplePatternList gPatterns = { pulseStairs, rainbowWithGlitter, redCarpetLoop, pulse,  confetti, sinelon, juggle, bpm, twinkle, runRainbow };
+String routineNames[] = { "Pulse Stairs", "GLTR Rainbow",  "Red Carpet", "Pulse", "Confetti", "Sinelon", "Juggle", "BPM", "Twinkle", "Step Rainbow" };
+//SimplePatternList gPatterns = { pulseStairs, pride, rainbow, redCarpetLoop, rainbowWithGlitter, confetti, sinelon, juggle, bpm, twinkle, runRainbow };
+//String routineNames[] = { "Pulse Stairs", "Pride", "Rainbow", "Red Carpet", "GLTR Rainbow", "Confetti", "Sinelon", "Juggle", "BPM", "Twinkle", "Step Rainbow" };
+//SimplePatternList gPatterns = { pride, rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm, twinkle};
+//String routineNames[] = { "Pride", "Rainbow", "GLTR Rainbow", "Confetti", "Sinelon", "Juggle", "BPM", "Twinkle"};
+//SimplePatternList gPatterns = { pulse };
+//String routineNames[] = { "pulse" };
 void nextPattern()
 {
   #ifdef DEBUG2
@@ -61,6 +66,7 @@ void LEDTaskCode( void * pvParameters ){
         EVERY_N_SECONDS( ROUTINE_CYCLE_TIME_S ) { nextPattern(); } // change patterns periodically
         EVERY_N_SECONDS( 30 ) {  // for twinkle 
           chooseNextColorPalette( gTargetPalette ); 
+          randomHue = random(256);
         }
       break;
       case remote:
@@ -94,6 +100,7 @@ void LEDTaskCode( void * pvParameters ){
         } 
         EVERY_N_SECONDS( 30 ) { 
           chooseNextColorPalette( gTargetPalette ); // for twinkle 
+          randomHue = random(256);
         }
       break;
 //      case night:

@@ -41,6 +41,14 @@ void sinelon()
   int pos = beatsin16( 13, 0, LED_COUNT-1 );
   leds[pos] += CHSV( gHue, 255, 192);
 }
+//line sinelon but slower and shows random color every 30 seconds
+void pulse()
+{
+  // a colored dot sweeping back and forth, with fading trails
+  fadeToBlackBy( leds, LED_COUNT, 20);
+  int pos = beatsin16( 7, 0, LED_COUNT-1 );
+  leds[pos] += CHSV( randomHue, 255, 192);
+}
 
 void bpm()
 {
@@ -55,12 +63,12 @@ void bpm()
 //global variables for LEDID
 unsigned long LEDIDLastFrame = 0;
 unsigned long LEDIDLastLED = 0;
-#define SECONDS_PER_LED 1
+#define MS_PER_LED 500
 void LEDID() {
-  if ((millis() - LEDIDLastFrame) > SECONDS_PER_LED*1000) {
+  if ((millis() - LEDIDLastFrame) > MS_PER_LED) {
     LEDIDLastFrame = millis();
     Serial.print("Showing LED number ");
-    if (LEDIDLastLED >= LED_COUNT-1) {
+    if (LEDIDLastLED >= LED_COUNT) {
       leds[LED_COUNT-1].setRGB(0,0,0);
       LEDIDLastLED = 0;
     }

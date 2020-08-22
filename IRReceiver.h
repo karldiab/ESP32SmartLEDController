@@ -32,6 +32,9 @@ void decodeIRCommand(unsigned int value);
 #define button_smooth 16246807
 
 void toggleDisplayMode() {
+  #ifdef DEBUG3
+    Serial.println("Got remote command");
+  #endif
    switch (currentDisplayMode) {
       case normal:
         previousDisplayMode = currentDisplayMode; 

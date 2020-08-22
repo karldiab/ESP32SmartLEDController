@@ -9,7 +9,7 @@ struct staircaseStep {
   int lastIndex; //last index, inclusive
   bool orderReversed; //do the leds run backwards?
 };
-#define NUMBER_OF_STAIRS 9
+#define NUMBER_OF_STAIRS 12
 const staircaseStep  stairs[NUMBER_OF_STAIRS] PROGMEM = {
   {0,10,false},
   {11,22,true},
@@ -19,7 +19,10 @@ const staircaseStep  stairs[NUMBER_OF_STAIRS] PROGMEM = {
   {59,70,true},
   {71,82,false},
   {83,94,true},
-  {95,106,false}
+  {95,106,false},
+  {107,118,false},
+  {119,154,false},
+  {155,191,false}
 };
 
 
@@ -148,7 +151,7 @@ double calculateCosWaveformFactor(int ledNo, int wavePosition, int frameNumber, 
 int redCarpetFrameNumber = 0;
 int redCarpetStairNumber = 0;
 bool reverseDirection = false;
-#define RED_CARPET_TOTAL_FRAMES 128
+#define RED_CARPET_TOTAL_FRAMES 32
 #define RED_CARPET_WAVE_WIDTH 12
 void redCarpetLoop() {
   int wavePosition;

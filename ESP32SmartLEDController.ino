@@ -7,7 +7,7 @@
 //LED Strip driver definitions
 #define LED_TYPE    WS2811
 #define COLOR_ORDER BRG
-#define LED_COUNT 108
+#define LED_COUNT 191
 #define LED_PIN    12
 #define FRAMES_PER_SECOND  120
 #define MAX_BRIGHTNESS_VALUE 10
@@ -34,7 +34,7 @@ volatile unsigned long screenLastUpdated = 0;
 //brightness is a value from 0 to 10
 volatile byte brightness = 10;
 //array to store solid color to display on LEDs as commanded by the ir remote
-int color[3] = {255,255,255}; //RGB values from 
+int color[3] = {128,0,256}; //RGB values from 
 
 #include "LEDDriver.h"
 #include "DisplayDriver.h"
