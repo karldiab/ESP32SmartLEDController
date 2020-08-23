@@ -4,9 +4,6 @@
 FASTLED_USING_NAMESPACE
 CRGB leds[LED_COUNT];
 
-volatile bool carpetDoneUnroll = false;
-volatile bool carpetDoneRollUp = false;
-volatile unsigned long nightLightLastTriggered = 0;
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 uint8_t randomHue = random(256);
@@ -110,30 +107,16 @@ void LEDTaskCode( void * pvParameters ){
       break;
       case night:
       unsigned long msSinceLastMotion = millis() - motionLastDetected;
-      unsigned long msSinceLastTriggered = millis() - nightLightLastTriggered;
       if (msSinceLastMotion < MS_NIGHT_MODE_STAY_ON) {
         #ifdef DEBUG3
           prntln("unrolling carpet");
         #endif
         redCarpetUnroll();
-//        if (msSinceLastTriggered > MS_NIGHT_MODE_STAY_ON) {
-//        #ifdef DEBUG3
-//          Serial.println("triggering new light event");
-//        #endif
-//          nightLightLastTriggered = millis();
-//        }
-//        else if (msSinceLastTriggered < 10000) {
-//        #ifdef DEBUG3
-//          Serial.println("unrolling carpet");
-//        #endif
-//          redCarpetUnroll();
-//        } 
-      } else {
+      } else if (msSinceLastMotion >= MS_NIGHT_MODE_STAY_ON && msSinceLastMotion < MS_NIGHT_MODE_STAY_ON + 15000){
         #ifdef DEBUG3
           prntln("rolling up carpet");
         #endif
         redCarpetRollUp();
-        nightLightLastTriggered = millis();
       }
       FastLED.show();  
       FastLED.delay(1000/FRAMES_PER_SECOND); 

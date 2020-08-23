@@ -12,7 +12,7 @@
 #define FRAMES_PER_SECOND  120
 #define MAX_BRIGHTNESS_VALUE 10
 #define ROUTINE_CYCLE_TIME_S 120
-#define MS_NIGHT_MODE_STAY_ON 120000
+#define MS_NIGHT_MODE_STAY_ON 20000
 
 //global variables to keep track of settings
 enum displayMode {

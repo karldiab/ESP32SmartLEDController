@@ -240,12 +240,12 @@ bool redCarpetUnroll() {
   //only do first 10 stairs
   //when done make sure all leds on the stairs are fully lit
   if (redCarpetStairNumber >= 10) {
-    for(int i=0; i<=stairs[9].lastIndex; i++) { 
-      leds[i].setRGB(color[0],color[1],color[2]);
-    }
-    for(int i=stairs[9].lastIndex+1; i<=LED_COUNT; i++) { 
-      leds[i].setRGB(0,0,0);
-    }
+//    for(int i=0; i<=stairs[9].lastIndex; i++) { 
+//      leds[i].setRGB(color[0],color[1],color[2]);
+//    }
+//    for(int i=stairs[9].lastIndex+1; i<=LED_COUNT; i++) { 
+//      leds[i].setRGB(0,0,0);
+//    }
     return true;
   }
   #ifdef DEBUG5
