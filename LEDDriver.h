@@ -4,10 +4,10 @@
 FASTLED_USING_NAMESPACE
 CRGB leds[LED_COUNT];
 
-#define S_NIGHT_MODE_STAY_ON 120
-bool motionDetectBeingHandled = false;
-bool carpetDoneUnroll = false;
-bool carpetDoneRollup = false;
+#define MS_NIGHT_MODE_STAY_ON 120000
+volatile bool carpetDoneUnroll = false;
+volatile bool carpetDoneRollUp = false;
+volatile unsigned long nightLightLastTriggered = 0;
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 uint8_t randomHue = random(256);
@@ -103,30 +103,36 @@ void LEDTaskCode( void * pvParameters ){
           randomHue = random(256);
         }
       break;
-//      case night:
-//      //if new motion detected
-//        if (motionDetected && !motionDetectBeingHandled) {
-//          carpetDoneUnroll = false;
-//          carpetDoneRollUp = false;
-//          redCarpetFrameNumber = 0;
-//          redCarpetStairNumber = 0;
-//          motionDetectBeingHandled = true;
+      case night:
+      unsigned long msSinceLastMotion = millis() - motionLastDetected;
+      unsigned long msSinceLastTriggered = millis() - nightLightLastTriggered;
+      if (msSinceLastMotion < MS_NIGHT_MODE_STAY_ON) {
+        #ifdef DEBUG3
+          Serial.println("unrolling carpet");
+        #endif
+        redCarpetUnroll();
+//        if (msSinceLastTriggered > MS_NIGHT_MODE_STAY_ON) {
+//        #ifdef DEBUG3
+//          Serial.println("triggering new light event");
+//        #endif
+//          nightLightLastTriggered = millis();
 //        }
-//        if (motionDetectBeingHandled) {
-//          if (!carpetDoneUnroll) {
-//            if (redCarpetUnroll()) {
-//              carpetDoneUnroll = true;
-//              FastLED.delay(1000*S_NIGHT_MODE_STAY_ON);
-//            }
-//          }
-//          if (!carpetDoneRollup) {
-//            if (redCarpetRollup()) {
-//              carpetDoneRollup = true;
-//              motionDetectBeingHandled = false;
-//            }
-//          }
-//        }
-//      break;
+//        else if (msSinceLastTriggered < 10000) {
+//        #ifdef DEBUG3
+//          Serial.println("unrolling carpet");
+//        #endif
+//          redCarpetUnroll();
+//        } 
+      } else {
+        #ifdef DEBUG3
+          Serial.println("rolling up carpet");
+        #endif
+        redCarpetRollUp();
+        nightLightLastTriggered = millis();
+      }
+      FastLED.show();  
+      FastLED.delay(1000/FRAMES_PER_SECOND); 
+      break;
     }
 
   } 
@@ -144,6 +150,10 @@ void setupLEDs() {
 }
 
 void changeBrightness() {
+  #ifdef DEBUG
+    Serial.print("New brightness (0-255): ");
+    Serial.println(map(brightness, 0,10,0,255));
+  #endif
   FastLED.setBrightness(map(brightness, 0,10,0,255));
 }
 

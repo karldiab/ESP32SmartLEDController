@@ -12,6 +12,9 @@
 #define AA_FONT_SMALL NotoSansBold15
 #define AA_FONT_MED NotoSans24
 #define AA_FONT_LARGE NotoSansBold36
+
+#define MS_MIN_SCREEN_UPDATE_INTERVAL 2000
+unsigned long screenLastUpdated = 0;
 // Use hardware SPI
 TFT_eSPI tft = TFT_eSPI();
 void updateDisplay();
@@ -53,6 +56,9 @@ bool doesDisplayNeedUpdating() {
       colorLastDisplayed[i] = color[i];
     }
   }
+  if (millis() - screenLastUpdated >= MS_MIN_SCREEN_UPDATE_INTERVAL) {
+    needsUpdating = true;
+  }
   return needsUpdating;
 }
 void updateDisplay() {
@@ -79,9 +85,24 @@ void updateDisplay() {
       tft.print(getCurrentPatternNumber());
       tft.print(": ");
       tft.println(routineNames[getCurrentPatternNumber()]);
+      tft.setTextColor(convertRGB(color[0],color[1],color[2]), TFT_BLACK);
+      tft.println("Selected Color:");
+      tft.print(color[0]);
+      tft.print(",");
+      tft.print(color[1]);
+      tft.print(",");
+      tft.println(color[2]);
     break;
     case night:
       tft.println("NIGHT");
+      tft.loadFont(AA_FONT_SMALL);
+      tft.setTextColor(convertRGB(color[0],color[1],color[2]), TFT_BLACK);
+      tft.println("Color:");
+      tft.print(color[0]);
+      tft.print(",");
+      tft.print(color[1]);
+      tft.print(",");
+      tft.println(color[2]);
     break;
     case off:
        tft.loadFont(AA_FONT_LARGE);
@@ -125,18 +146,16 @@ void updateDisplay() {
   tft.println(brightness);
   tft.setTextColor(TFT_YELLOW, TFT_BLACK);
   if (motionDetected) {
-    tft.println("Motion Detected");   
+    tft.println("Motion Detected");  
   } else {
-    tft.println("No Motion");
-    #ifdef DEBUG3
-      tft.print(((millis() - motionLastDetected)/3600000)/1000);
-      tft.print("h ");
-      tft.print((((millis() - motionLastDetected)%3600000)/60)/1000);
-      tft.print("m "); 
-      tft.print(((millis() - motionLastDetected)%60000)/1000);
-      tft.println("s "); 
-    #endif
+    tft.println("No Motion for");
+    tft.print(((millis() - motionLastDetected)/3600000)/1000);
+    tft.print("h ");
+    tft.print((((millis() - motionLastDetected)%3600000)/60)/1000);
+    tft.print("m "); 
+    tft.print(((millis() - motionLastDetected)%60000)/1000);
+    tft.println("s "); 
   }
   
-
+    screenLastUpdated = millis();
 }

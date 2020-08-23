@@ -151,7 +151,7 @@ double calculateCosWaveformFactor(int ledNo, int wavePosition, int frameNumber, 
 int redCarpetFrameNumber = 0;
 int redCarpetStairNumber = 0;
 bool reverseDirection = false;
-#define RED_CARPET_TOTAL_FRAMES 32
+#define RED_CARPET_TOTAL_FRAMES 24
 #define RED_CARPET_WAVE_WIDTH 12
 void redCarpetLoop() {
   int wavePosition;
@@ -227,12 +227,21 @@ bool redCarpetUnroll() {
       leds[i].setRGB(0,0,0);
     }
   }
+  
   if (redCarpetFrameNumber > RED_CARPET_TOTAL_FRAMES) {
     redCarpetFrameNumber = 0;
     redCarpetStairNumber++;
     
   }
-  if (redCarpetStairNumber >= NUMBER_OF_STAIRS) {
+  //only do first 10 stairs
+  //when done make sure all leds on the stairs are fully lit
+  if (redCarpetStairNumber >= 10) {
+    for(int i=0; i<=stairs[9].lastIndex; i++) { 
+      leds[i].setRGB(color[0],color[1],color[2]);
+    }
+    for(int i=stairs[9].lastIndex+1; i<=LED_COUNT; i++) { 
+      leds[i].setRGB(0,0,0);
+    }
     return true;
   }
   #ifdef DEBUG5
@@ -277,7 +286,11 @@ bool redCarpetRollUp() {
     redCarpetStairNumber--;
     
   }
+  //when done make sure all leds are off
   if (redCarpetStairNumber < 0) {
+    for(int i=0; i<LED_COUNT; i++) { 
+      leds[i].setRGB(0,0,0);
+    }
     return true;
   }
   #ifdef DEBUG5

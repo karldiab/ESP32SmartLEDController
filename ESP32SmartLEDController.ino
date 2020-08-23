@@ -1,6 +1,6 @@
 #define DEBUG 1
 #define DEBUG2 1
-#define DEBUG3 1
+//#define DEBUG3 1
 //#define DEBUG5 1
 #define IR_RECEIVE_PIN 13
 #define MOTION_PIN 27
@@ -27,14 +27,13 @@ displayMode previousDisplayMode = normal;
 //volitile because it is accessed in interupt function
 volatile bool motionDetected = false;
 volatile unsigned long motionLastDetected = 0;
-volatile unsigned long screenLastUpdated = 0;
 //volatile bool motionDetectBeingHandled = false;
 //volatile bool carpetDoneUnroll = false;
 //volatile bool carpetDoneRollup = false;
 //brightness is a value from 0 to 10
 volatile byte brightness = 10;
 //array to store solid color to display on LEDs as commanded by the ir remote
-int color[3] = {128,0,256}; //RGB values from 
+int color[3] = {255,0,255}; //RGB values from 
 
 #include "LEDDriver.h"
 #include "DisplayDriver.h"
@@ -75,10 +74,10 @@ void setup(void) {
   Serial.begin(115200);
   //for motion detector
   pinMode(MOTION_PIN, INPUT);
-//setup timer interupt firing every 50 ms to check status of motion detector
+//setup timer interupt firing every 150 ms to check status of motion detector
   myTimer = timerBegin(0, 80, true);
   timerAttachInterrupt(myTimer, &ISR2, true);
-  timerAlarmWrite(myTimer, 50000, true);
+  timerAlarmWrite(myTimer, 150000, true);
   timerAlarmEnable(myTimer);
   //for lcd
   setupDisplay();
@@ -102,8 +101,5 @@ void setup(void) {
 int counter = 0;
 void loop() {
   //update display if its been long enough
-  if ((millis() - screenLastUpdated) > 250) {
-    screenLastUpdated = millis();
-    updateDisplay();
-  }
+  updateDisplay();
 }
