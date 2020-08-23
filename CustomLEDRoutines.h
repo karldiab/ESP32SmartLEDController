@@ -159,13 +159,17 @@ void redCarpetLoop() {
     for(int i=0; i<LED_COUNT; i++) { 
       leds[i].setRGB(0,0,0);
     }
-  }
+  } 
   if (redCarpetFrameNumber > RED_CARPET_TOTAL_FRAMES) {
     redCarpetFrameNumber = 0;
     if (!reverseDirection) {
       redCarpetStairNumber++;
     } else {
+      for(int i=stairs[redCarpetStairNumber].firstIndex; i<=stairs[redCarpetStairNumber].lastIndex; i++) { 
+        leds[i].setRGB(0,0,0);
+      }
       redCarpetStairNumber--;
+      
     }
     
   }
