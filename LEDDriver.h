@@ -27,7 +27,7 @@ String routineNames[] = { "Pulse Stairs", "GLTR Rainbow",  "Red Carpet", "Pulse"
 void nextPattern()
 {
   #ifdef DEBUG2
-    Serial.println("nextPattern() called");
+    prntln("nextPattern() called");
   #endif
   // add one to the current pattern number, and wrap around at the end
   gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
@@ -113,7 +113,7 @@ void LEDTaskCode( void * pvParameters ){
       unsigned long msSinceLastTriggered = millis() - nightLightLastTriggered;
       if (msSinceLastMotion < MS_NIGHT_MODE_STAY_ON) {
         #ifdef DEBUG3
-          Serial.println("unrolling carpet");
+          prntln("unrolling carpet");
         #endif
         redCarpetUnroll();
 //        if (msSinceLastTriggered > MS_NIGHT_MODE_STAY_ON) {
@@ -130,7 +130,7 @@ void LEDTaskCode( void * pvParameters ){
 //        } 
       } else {
         #ifdef DEBUG3
-          Serial.println("rolling up carpet");
+          prntln("rolling up carpet");
         #endif
         redCarpetRollUp();
         nightLightLastTriggered = millis();

@@ -18,6 +18,21 @@ unsigned long screenLastUpdated = 0;
 // Use hardware SPI
 TFT_eSPI tft = TFT_eSPI();
 void updateDisplay();
+#define NUMBER_OF_MODES 5
+ // progmem variables to organize my own LED layout
+struct DisplayMode {
+  String longName;
+  String codeName;
+};
+#define NUMBER_OF_STAIRS 5
+//these are the modes we want to make available
+const DisplayMode  modes[NUMBER_OF_MODES] PROGMEM = {
+  {"NORMAL","normal"},
+  {"COLOR","remote"},
+  {"OFF","off"},
+  {"NIGHT","night"},
+  {"CONSTANT", "single"}
+};
 
 void setupDisplay() {
   tft.begin();

@@ -37,6 +37,7 @@ volatile byte brightness = 10;
 int color[3] = {255,0,255}; //RGB values from 
 bool colorManuallySelected = false;
 
+#include "UtilityFunctions.h"
 #include "LEDDriver.h"
 #include "DisplayDriver.h"
 #include "IRReceiver.h"

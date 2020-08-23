@@ -31,6 +31,18 @@ void decodeIRCommand(unsigned int value);
 #define button_pink 16214167
 #define button_smooth 16246807
 
+void brightnessUp(){
+    if (brightness < MAX_BRIGHTNESS_VALUE)
+      brightness++;
+    changeBrightness();
+}
+void brightnessDown(){
+  if (brightness > 0)
+    brightness--;
+  changeBrightness();
+}
+
+
 void toggleDisplayMode() {
   #ifdef DEBUG3
     Serial.println("Got remote command");
@@ -115,16 +127,12 @@ void decodeIRCommand(unsigned int value) {
     break;
     case button_brightnessUp:
       
-      if (brightness < MAX_BRIGHTNESS_VALUE)
-        brightness++;
-      changeBrightness();
+    brightnessUp();
       
     break;
     case button_brightnessDown:
       
-      if (brightness > 0)
-        brightness--;
-      changeBrightness();
+    brightnessDown();
     break;
     case button_orange:
       

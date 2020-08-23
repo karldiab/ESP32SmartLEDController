@@ -4,13 +4,13 @@
  */
 
  // progmem variables to organize my own LED layout
-struct staircaseStep {
+struct StaircaseStep {
   int firstIndex; //first index, inclusive
   int lastIndex; //last index, inclusive
   bool orderReversed; //do the leds run backwards?
 };
 #define NUMBER_OF_STAIRS 12
-const staircaseStep  stairs[NUMBER_OF_STAIRS] PROGMEM = {
+const StaircaseStep  stairs[NUMBER_OF_STAIRS] PROGMEM = {
   {0,10,false},
   {11,22,true},
   {23,34,false},

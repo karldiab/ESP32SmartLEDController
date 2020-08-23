@@ -1,9 +1,3 @@
-/*********
-  Rui Santos
-  Complete project details at https://randomnerdtutorials.com  
-*********/
-
-// Load Wi-Fi library
 #include <WiFi.h>
 
 // yes I know the ssid and password is on github, I changed to fake value so enjoy lil hacker bots
@@ -16,13 +10,14 @@ WiFiServer server(80);
 // Variable to store the HTTP request
 String header;
 
-// Auxiliar variables to store the current output state
-String output26State = "off";
-String output27State = "off";
+String controlPanelHTML;
+unsigned long controlPanelLastGenerated = 0;
+//ms interval that the arduino should generate a new control panel with updated metrics
+#define MS_GENERATE_CONTROL_PANEL 1000
+void generateControlPanel();
+void handleRequest(String header);
 
-// Assign output variables to GPIO pins
-const int output26 = 26;
-const int output27 = 27;
+
 
 // Current time
 unsigned long currentTime = millis();
@@ -32,12 +27,6 @@ unsigned long previousTime = 0;
 const long timeoutTime = 2000;
 
 void webServerSetup() {
-  pinMode(output26, OUTPUT);
-  pinMode(output27, OUTPUT);
-  // Set outputs to LOW
-  digitalWrite(output26, LOW);
-  digitalWrite(output27, LOW);
-
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Connecting to ");
   Serial.println(ssid);
@@ -48,25 +37,30 @@ void webServerSetup() {
   }
   // Print local IP address and start web server
   Serial.println("");
-  Serial.println("WiFi connected.");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  prntln("WiFi connected.");
+  prntln("IP address: ");
+  prntln(String(WiFi.localIP()));
   server.begin();
 }
 
 void webServerLoop(){
+  if ((millis() - controlPanelLastGenerated) > MS_GENERATE_CONTROL_PANEL || controlPanelLastGenerated == 0) {
+    controlPanelLastGenerated = millis();
+    generateControlPanel();
+  }
   WiFiClient client = server.available();   // Listen for incoming clients
-
   if (client) {                             // If a new client connects,
     currentTime = millis();
     previousTime = currentTime;
-    Serial.println("New Client.");          // print a message out in the serial port
+    prntln("New Client.");          // print a message out in the serial port
     String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected() && currentTime - previousTime <= timeoutTime) {  // loop while the client's connected
       currentTime = millis();
       if (client.available()) {             // if there's bytes to read from the client,
         char c = client.read();             // read a byte, then
-        Serial.write(c);                    // print it out the serial monitor
+        #ifdef DEBUG4
+          Serial.write(c);                    // print it out the serial monitor
+        #endif
         header += c;
         if (c == '\n') {                    // if the byte is a newline character
           // if the current line is blank, you got two newline characters in a row.
@@ -79,60 +73,11 @@ void webServerLoop(){
             client.println("Connection: close");
             client.println();
             
-            // turns the GPIOs on and off
-            if (header.indexOf("GET /26/on") >= 0) {
-              Serial.println("GPIO 26 on");
-              output26State = "on";
-              digitalWrite(output26, HIGH);
-            } else if (header.indexOf("GET /26/off") >= 0) {
-              Serial.println("GPIO 26 off");
-              output26State = "off";
-              digitalWrite(output26, LOW);
-            } else if (header.indexOf("GET /27/on") >= 0) {
-              Serial.println("GPIO 27 on");
-              output27State = "on";
-              digitalWrite(output27, HIGH);
-            } else if (header.indexOf("GET /27/off") >= 0) {
-              Serial.println("GPIO 27 off");
-              output27State = "off";
-              digitalWrite(output27, LOW);
-            }
-            
-            // Display the HTML web page
-            client.println("<!DOCTYPE html><html>");
-            client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-            client.println("<link rel=\"icon\" href=\"data:,\">");
-            // CSS to style the on/off buttons 
-            // Feel free to change the background-color and font-size attributes to fit your preferences
-            client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
-            client.println(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;");
-            client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
-            client.println(".button2 {background-color: #555555;}</style></head>");
-            
-            // Web Page Heading
-            client.println("<body><h1>ESP32 Web Server</h1>");
-            
-            // Display current state, and ON/OFF buttons for GPIO 26  
-            client.println("<p>GPIO 26 - State " + output26State + "</p>");
-            // If the output26State is off, it displays the ON button       
-            if (output26State=="off") {
-              client.println("<p><a href=\"/26/on\"><button class=\"button\">ON</button></a></p>");
-            } else {
-              client.println("<p><a href=\"/26/off\"><button class=\"button button2\">OFF</button></a></p>");
-            } 
-               
-            // Display current state, and ON/OFF buttons for GPIO 27  
-            client.println("<p>GPIO 27 - State " + output27State + "</p>");
-            // If the output27State is off, it displays the ON button       
-            if (output27State=="off") {
-              client.println("<p><a href=\"/27/on\"><button class=\"button\">ON</button></a></p>");
-            } else {
-              client.println("<p><a href=\"/27/off\"><button class=\"button button2\">OFF</button></a></p>");
-            }
-            client.println("</body></html>");
-            
+            handleRequest(header);
+            client.println(controlPanelHTML);
             // The HTTP response ends with another blank line
             client.println();
+            
             // Break out of the while loop
             break;
           } else { // if you got a newline, then clear currentLine
@@ -147,7 +92,87 @@ void webServerLoop(){
     header = "";
     // Close the connection
     client.stop();
-    Serial.println("Client disconnected.");
-    Serial.println("");
+    prntln("Client disconnected.");
   }
 }
+void generateControlPanel() {
+  #ifdef DEBUG 3
+    prntln("Generating new control Panel");
+  #endif
+  controlPanelHTML = String("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"icon\" href=\"data:,\">")
+  +String("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}")
+  +String(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;")
+  +String("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}")
+            +String(".button2 {background-color: #555555;}</style></head>")
+            
+            // Web Page Heading
+            +String("<body><h1>LED Kommander</h1>")
+            
+            // Display current state, and ON/OFF buttons for GPIO 26  
+            //client.println("<p>GPIO 26 - State " + output26State + "</p>");
+            // If the output26State is off, it displays the ON button   
+//            client.print("<h3>Display Mode: ");
+//            client.print(currentDisplayMode);
+//            client.println("</h3>");
+            +String("<h3>Brightness: ")
+            +String(brightness)
+            +String("</h3>")
+            +String("<h3>Displaying Routine: #")
+            +String(getCurrentPatternNumber())
+            +String(": ")
+            +String(routineNames[getCurrentPatternNumber()])
+            +String("</h3>");
+            if (motionDetected) {
+              controlPanelHTML += String("<h3>Motion Detected</h3>");
+            } else {
+              controlPanelHTML +=String("<h3>No Motion for ")
+              +String(((millis() - motionLastDetected)/3600000)/1000)
+              +String("h ")
+              +String((((millis() - motionLastDetected)%3600000)/60)/1000)
+              +String("m " )
+              +String(((millis() - motionLastDetected)%60000)/1000)
+              +String("s ");
+            }
+            controlPanelHTML +=String("<div class=\"btn-group\">");
+            
+            if (currentDisplayMode == off) {
+              controlPanelHTML +=String("<a href=\"/mode/on\"><button class=\"button\">TURN ON</button></a>");
+            } else {
+              controlPanelHTML +=String("<a href=\"/mode/off\"><button class=\"button button2\">TURN OFF</button></a>");
+            } 
+            controlPanelHTML +=String("<a href=\"/mode/change\"><button class=\"button\">CHANGE MODE</button></a>")
+            +String("<a href=\"/brightness/up\"><button class=\"button\">BRIGHTNESS UP</button></a>")
+            +String("<a href=\"/brightness/down\"><button class=\"button\">BRIGHTNESS DOWN</button></a>")
+            //client.println("</div>"
+            +String("</body></html>");
+}
+
+void handleRequest(String header) {
+  if (header.indexOf("GET /mode/on") >= 0) {
+    prntln("turning on");
+    if (currentDisplayMode == off) { 
+      currentDisplayMode = previousDisplayMode; 
+    }
+  } else if (header.indexOf("GET /mode/off") >= 0) {
+    prntln("turning off");
+    if (currentDisplayMode != off) { 
+      previousDisplayMode = currentDisplayMode; 
+      currentDisplayMode = off; 
+     }
+  } else if (header.indexOf("GET /mode/change") >= 0) {
+    prntln("Change Mode");
+    toggleDisplayMode();
+  } else if (header.indexOf("GET /brightness/up") >= 0) {
+    prntln("Brightness up");
+    brightnessUp();
+  } else if (header.indexOf("GET /brightness/down") >= 0) {
+    prntln("Brightness down");
+    brightnessDown();
+  } else {
+    //if we got here, request not recognized
+    return;
+  }
+  //generate new control panel since something changed
+  generateControlPanel();
+}
+
