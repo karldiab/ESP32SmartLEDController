@@ -11,7 +11,8 @@
 #define LED_PIN    12
 #define FRAMES_PER_SECOND  120
 #define MAX_BRIGHTNESS_VALUE 10
-#define ROUTINE_CYCLE_TIME_S 60
+#define ROUTINE_CYCLE_TIME_S 120
+#define MS_NIGHT_MODE_STAY_ON 120000
 
 //global variables to keep track of settings
 enum displayMode {
@@ -34,6 +35,7 @@ volatile unsigned long motionLastDetected = 0;
 volatile byte brightness = 10;
 //array to store solid color to display on LEDs as commanded by the ir remote
 int color[3] = {255,0,255}; //RGB values from 
+bool colorManuallySelected = false;
 
 #include "LEDDriver.h"
 #include "DisplayDriver.h"

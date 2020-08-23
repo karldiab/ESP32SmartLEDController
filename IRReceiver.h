@@ -86,6 +86,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 255;
       color[1] = 0;
       color[2] = 0;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_green:
@@ -93,6 +94,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 0;
       color[1] = 255;
       color[2] = 0;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_blue:
@@ -100,6 +102,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 0;
       color[1] = 0;
       color[2] = 255;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_white:
@@ -107,6 +110,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 255;
       color[1] = 255;
       color[2] = 255;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_brightnessUp:
@@ -127,6 +131,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 255;
       color[1] = 60;
       color[2] = 0;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_aquamarine:
@@ -134,6 +139,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 32;
       color[1] = 210;
       color[2] = 137;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_navy:
@@ -141,6 +147,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 0;
       color[1] = 0;
       color[2] = 128;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_darkOrange:
@@ -148,6 +155,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 255;
       color[1] = 45;
       color[2] = 0;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_turquoise:
@@ -155,6 +163,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 64;
       color[1] = 224;
       color[2] = 208;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_darkPurple:
@@ -162,6 +171,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 128;
       color[1] = 0;
       color[2] = 128;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_brightOrange:
@@ -169,6 +179,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 255;
       color[1] = 100;
       color[2] = 0;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_mediumTurquoise:
@@ -176,6 +187,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 72;
       color[1] = 209;
       color[2] = 204;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_purple:
@@ -183,6 +195,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 128;
       color[1] = 0;
       color[2] = 156;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_yellow:
@@ -190,6 +203,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 255;
       color[1] = 165;
       color[2] = 0;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_darkTurquoise:
@@ -197,6 +211,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 0;
       color[1] = 206;
       color[2] = 209;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     case button_pink:
@@ -204,6 +219,7 @@ void decodeIRCommand(unsigned int value) {
       color[0] = 255;
       color[1] = 20;
       color[2] = 147;
+      colorManuallySelected = true;
       if (currentDisplayMode != remote) { previousDisplayMode = currentDisplayMode; currentDisplayMode = remote; }
     break;
     default:
