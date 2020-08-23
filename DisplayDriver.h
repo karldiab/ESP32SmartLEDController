@@ -18,21 +18,7 @@ unsigned long screenLastUpdated = 0;
 // Use hardware SPI
 TFT_eSPI tft = TFT_eSPI();
 void updateDisplay();
-#define NUMBER_OF_MODES 5
- // progmem variables to organize my own LED layout
-struct DisplayMode {
-  String longName;
-  String codeName;
-};
-#define NUMBER_OF_STAIRS 5
-//these are the modes we want to make available
-const DisplayMode  modes[NUMBER_OF_MODES] PROGMEM = {
-  {"NORMAL","normal"},
-  {"COLOR","remote"},
-  {"OFF","off"},
-  {"NIGHT","night"},
-  {"CONSTANT", "single"}
-};
+String getDisplayModeText();
 
 void setupDisplay() {
   tft.begin();
@@ -91,7 +77,7 @@ void updateDisplay() {
   tft.loadFont(AA_FONT_MED);
   switch (currentDisplayMode) {
     case normal:
-      tft.println("NORMAL");
+      tft.println(getDisplayModeText());
       tft.loadFont(AA_FONT_SMALL);
       tft.setTextColor(TFT_WHITE, TFT_BLACK);
       tft.println("Displaying:");
@@ -109,7 +95,7 @@ void updateDisplay() {
       tft.println(color[2]);
     break;
     case night:
-      tft.println("NIGHT");
+      tft.println(getDisplayModeText());
       tft.loadFont(AA_FONT_SMALL);
       tft.setTextColor(convertRGB(color[0],color[1],color[2]), TFT_BLACK);
       tft.println("Color:");
@@ -121,14 +107,14 @@ void updateDisplay() {
     break;
     case off:
        tft.loadFont(AA_FONT_LARGE);
-       tft.println("OFF");
+       tft.println(getDisplayModeText());
        return;
     break;
     case wifi:
-       tft.println("WIFI");
+       tft.println(getDisplayModeText());
     break;
     case remote:
-       tft.println("COLOR");
+       tft.println(getDisplayModeText());
        tft.loadFont(AA_FONT_SMALL);
        tft.setTextColor(convertRGB(color[0],color[1],color[2]), TFT_BLACK);
        tft.println("Displaying Color:");
@@ -139,7 +125,7 @@ void updateDisplay() {
        tft.println(color[2]);
     break;
     case single:
-      tft.println("CONSTANT");
+      tft.println(getDisplayModeText());
       tft.loadFont(AA_FONT_SMALL);
       tft.setTextColor(TFT_WHITE, TFT_BLACK);
       tft.println("Displaying:");
@@ -150,7 +136,7 @@ void updateDisplay() {
       tft.println(routineNames[getCurrentPatternNumber()]);
     break;
     default:
-       tft.println("UNKNOWN");
+       tft.println(getDisplayModeText());
     break;
   }
   tft.loadFont(AA_FONT_SMALL);
@@ -174,3 +160,30 @@ void updateDisplay() {
   
     screenLastUpdated = millis();
 }
+
+String getDisplayModeText() {
+    switch (currentDisplayMode) {
+    case normal:
+      return String("NORMAL");
+    break;
+    case night:
+      return String("NIGHT");
+    break;
+    case off:
+       return String("OFF");
+    break;
+    case wifi:
+       return String("WIFI");
+    break;
+    case remote:
+       return String("COLOR");
+    break;
+    case single:
+      return String("CONSTANT");
+    break;
+    default:
+       return String("UNKNOWN");
+    break;
+}
+}
+

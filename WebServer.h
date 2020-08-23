@@ -11,11 +11,13 @@ WiFiServer server(80);
 String header;
 
 String controlPanelHTML;
+String controlPanelStaticHeader;
 unsigned long controlPanelLastGenerated = 0;
 //ms interval that the arduino should generate a new control panel with updated metrics
 #define MS_GENERATE_CONTROL_PANEL 1000
 void generateControlPanel();
 void handleRequest(String header);
+void generateStaticControlPanelHeader();
 
 
 
@@ -39,8 +41,9 @@ void webServerSetup() {
   Serial.println("");
   prntln("WiFi connected.");
   prntln("IP address: ");
-  prntln(String(WiFi.localIP()));
+  Serial.println(WiFi.localIP());
   server.begin();
+  generateStaticControlPanelHeader();
 }
 
 void webServerLoop(){
@@ -99,52 +102,57 @@ void generateControlPanel() {
   #ifdef DEBUG 3
     prntln("Generating new control Panel");
   #endif
-  controlPanelHTML = String("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"icon\" href=\"data:,\">")
-  +String("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}")
-  +String(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;")
-  +String("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}")
-            +String(".button2 {background-color: #555555;}</style></head>")
-            
-            // Web Page Heading
-            +String("<body><h1>LED Kommander</h1>")
-            
-            // Display current state, and ON/OFF buttons for GPIO 26  
-            //client.println("<p>GPIO 26 - State " + output26State + "</p>");
-            // If the output26State is off, it displays the ON button   
-//            client.print("<h3>Display Mode: ");
-//            client.print(currentDisplayMode);
-//            client.println("</h3>");
-            +String("<h3>Brightness: ")
-            +String(brightness)
-            +String("</h3>")
-            +String("<h3>Displaying Routine: #")
-            +String(getCurrentPatternNumber())
-            +String(": ")
-            +String(routineNames[getCurrentPatternNumber()])
-            +String("</h3>");
-            if (motionDetected) {
-              controlPanelHTML += String("<h3>Motion Detected</h3>");
-            } else {
-              controlPanelHTML +=String("<h3>No Motion for ")
-              +String(((millis() - motionLastDetected)/3600000)/1000)
-              +String("h ")
-              +String((((millis() - motionLastDetected)%3600000)/60)/1000)
-              +String("m " )
-              +String(((millis() - motionLastDetected)%60000)/1000)
-              +String("s ");
-            }
-            controlPanelHTML +=String("<div class=\"btn-group\">");
-            
-            if (currentDisplayMode == off) {
-              controlPanelHTML +=String("<a href=\"/mode/on\"><button class=\"button\">TURN ON</button></a>");
-            } else {
-              controlPanelHTML +=String("<a href=\"/mode/off\"><button class=\"button button2\">TURN OFF</button></a>");
-            } 
-            controlPanelHTML +=String("<a href=\"/mode/change\"><button class=\"button\">CHANGE MODE</button></a>")
-            +String("<a href=\"/brightness/up\"><button class=\"button\">BRIGHTNESS UP</button></a>")
-            +String("<a href=\"/brightness/down\"><button class=\"button\">BRIGHTNESS DOWN</button></a>")
-            //client.println("</div>"
-            +String("</body></html>");
+  controlPanelHTML = controlPanelStaticHeader
++String("<div class=\"row\"><div class=\"col-xs-12\"><div class=\"btn-group btn-group-lg\" role=\"group\" aria-label=\"Control Panel\">");
+if (currentDisplayMode == off) {
+  controlPanelHTML +=String("<a href=\"/mode/on\"><button type=\"button\" class=\"btn btn-success\">TURN ON</button></a>");
+} else {
+  controlPanelHTML +=String("<a href=\"/mode/off\"><button type=\"button\" class=\"btn btn-danger\">TURN OFF</button></a>");
+} 
+controlPanelHTML +=String("<a href=\"/mode/change\"><button type=\"button\" class=\"btn btn-primary\">CHANGE MODE</button></a>")
++String("<a href=\"/routine/up\"><button type=\"button\" class=\"btn btn-primary\">NEXT ROUTINE</button></a>")
++String("<a href=\"/routine/down\"><button type=\"button\" class=\"btn btn-primary\">PREVIOUS ROUTINE</button></a>")
++String("<a href=\"/brightness/up\"><button type=\"button\" class=\"btn btn-primary\">BRIGHTNESS UP</button></a>")
++String("<a href=\"/brightness/down\"><button type=\"button\" class=\"btn btn-primary\">BRIGHTNESS DOWN</button></a>")
++String("</div></div></div>")
++String("<div class=\"row\"><table class=\"table table-dark\"><thead><tr><th scope=\"col\">Setting</th><th scope=\"col\">Status</th></tr></thead><tbody><tr><td>Mode</td><td>")
++String(getDisplayModeText())
++String("</td></tr><tr><td>Displaying Routine</td><td>#")
++String(getCurrentPatternNumber())
++String(": ")
++String(routineNames[getCurrentPatternNumber()])
++String("</td></tr>")
++String("<tr><td>Brightness (0-10)</td><td>")
++String(brightness)
++String("</td></tr>")
++String("<tr style=\"color:rgb(")
++String(color[0])
++String(",")
++String(color[1])
++String(",")
++String(color[2])
++String(");\"><td>Selected Color</td><td>(")
++String(color[0])
++String(",")
++String(color[1])
++String(",")
++String(color[2])
++String(")</td></tr>")
++String("<tr><td>Motion</td><td>");
+if (motionDetected) {
+  controlPanelHTML += String("Motion Detected");
+} else {
+  controlPanelHTML +=String("No Motion for ")
+  +String(((millis() - motionLastDetected)/3600000)/1000)
+  +String("h ")
+  +String((((millis() - motionLastDetected)%3600000)/60)/1000)
+  +String("m " )
+  +String(((millis() - motionLastDetected)%60000)/1000)
+  +String("s ");
+}
+controlPanelHTML += String("</td></tr>")
++String("</tbody></table></div>")
++String("</div></body></html>");
 }
 
 void handleRequest(String header) {
@@ -162,6 +170,12 @@ void handleRequest(String header) {
   } else if (header.indexOf("GET /mode/change") >= 0) {
     prntln("Change Mode");
     toggleDisplayMode();
+  } else if (header.indexOf("GET /routine/up") >= 0) {
+    prntln("Next Routine");
+    nextPattern();
+  } else if (header.indexOf("GET /routine/down") >= 0) {
+    prntln("Previous Routine");
+    previousPattern();
   } else if (header.indexOf("GET /brightness/up") >= 0) {
     prntln("Brightness up");
     brightnessUp();
@@ -174,5 +188,17 @@ void handleRequest(String header) {
   }
   //generate new control panel since something changed
   generateControlPanel();
+}
+
+void generateStaticControlPanelHeader() {
+  controlPanelStaticHeader = String("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"icon\" href=\"data:,\">")
+  +String("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}")
+  +String(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;")
+  +String("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}")
+  +String(".button2 {background-color: #555555;}</style>")
+  +String("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css\" crossorigin=\"anonymous\"></head>")
+  
+  // Web Page Heading
+  +String("<body><div class=\"container\"><div class=\"row\"><div class=\"col-xs-12 text-center\"><h1>LED Kommander</h1></div></div>");
 }
 
