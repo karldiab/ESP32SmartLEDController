@@ -40,6 +40,7 @@ bool colorManuallySelected = false;
 #include "LEDDriver.h"
 #include "DisplayDriver.h"
 #include "IRReceiver.h"
+#include "WebServer.h"
 
 
 //create task to drive LEDs to run on second core
@@ -84,6 +85,7 @@ void setup(void) {
   //for lcd
   setupDisplay();
 
+  webServerSetup();
 
   //ir receiver
   irrecv.enableIRIn();  // Start the receiver
@@ -104,4 +106,6 @@ int counter = 0;
 void loop() {
   //update display if its been long enough
   updateDisplay();
+
+  webServerLoop();
 }
