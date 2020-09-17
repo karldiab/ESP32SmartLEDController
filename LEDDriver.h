@@ -61,6 +61,8 @@ void LEDTaskCode( void * pvParameters ){
         EVERY_N_SECONDS( 30 ) {  // for twinkle 
           chooseNextColorPalette( gTargetPalette ); 
           randomHue = random(256);
+        }
+        EVERY_N_SECONDS( 5 ) {
           if (!colorManuallySelected) {
             color[0] = random(256);color[1] = random(256);color[2] = random(256);
           }
@@ -98,6 +100,8 @@ void LEDTaskCode( void * pvParameters ){
         EVERY_N_SECONDS( 30 ) { 
           chooseNextColorPalette( gTargetPalette ); // for twinkle 
           randomHue = random(256);
+        }
+        EVERY_N_SECONDS( 5 ) {
           if (!colorManuallySelected) {
             color[0] = random(256);color[1] = random(256);color[2] = random(256);
           }

@@ -134,6 +134,13 @@ void updateDisplay() {
       tft.print(getCurrentPatternNumber());
       tft.print(": ");
       tft.println(routineNames[getCurrentPatternNumber()]);
+      tft.setTextColor(convertRGB(color[0],color[1],color[2]), TFT_BLACK);
+      tft.println("Selected Color:");
+      tft.print(color[0]);
+      tft.print(",");
+      tft.print(color[1]);
+      tft.print(",");
+      tft.println(color[2]);
     break;
     default:
        tft.println(getDisplayModeText());
