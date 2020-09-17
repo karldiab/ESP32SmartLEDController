@@ -4,8 +4,8 @@ void prntln(String text) {
   Serial.print("h");
   Serial.print(((runTime%3600000)/60)/1000);
   Serial.print("m"); 
-  Serial.print((runTime%60000)/1000);
-  Serial.print("s: "); 
+  Serial.print((runTime%60000));
+  Serial.print("ms: "); 
   Serial.println(text);
 }
 void prnt(String text) {

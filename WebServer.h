@@ -42,6 +42,8 @@ void webServerSetup() {
   prntln("WiFi connected.");
   prntln("IP address: ");
   Serial.println(WiFi.localIP());
+  //added delay to prevent crashing on startup
+  delay(250);
   server.begin();
   generateStaticControlPanelHeader();
 }
@@ -99,60 +101,63 @@ void webServerLoop(){
   }
 }
 void generateControlPanel() {
-  #ifdef DEBUG 3
+  #ifdef DEBUG3
     prntln("Generating new control Panel");
   #endif
   controlPanelHTML = controlPanelStaticHeader
-+String("<div class=\"row\"><div class=\"col-xs-12\"><div class=\"btn-group btn-group-lg\" role=\"group\" aria-label=\"Control Panel\">");
-if (currentDisplayMode == off) {
-  controlPanelHTML +=String("<a href=\"/mode/on\"><button type=\"button\" class=\"btn btn-success\">TURN ON</button></a>");
-} else {
-  controlPanelHTML +=String("<a href=\"/mode/off\"><button type=\"button\" class=\"btn btn-danger\">TURN OFF</button></a>");
-} 
-controlPanelHTML +=String("<a href=\"/mode/change\"><button type=\"button\" class=\"btn btn-primary\">CHANGE MODE</button></a>")
-+String("<a href=\"/routine/up\"><button type=\"button\" class=\"btn btn-primary\">NEXT ROUTINE</button></a>")
-+String("<a href=\"/routine/down\"><button type=\"button\" class=\"btn btn-primary\">PREVIOUS ROUTINE</button></a>")
-+String("<a href=\"/brightness/up\"><button type=\"button\" class=\"btn btn-primary\">BRIGHTNESS UP</button></a>")
-+String("<a href=\"/brightness/down\"><button type=\"button\" class=\"btn btn-primary\">BRIGHTNESS DOWN</button></a>")
-+String("</div></div></div>")
-+String("<div class=\"row\"><table class=\"table table-dark\"><thead><tr><th scope=\"col\">Setting</th><th scope=\"col\">Status</th></tr></thead><tbody><tr><td>Mode</td><td>")
-+String(getDisplayModeText())
-+String("</td></tr><tr><td>Displaying Routine</td><td>#")
-+String(getCurrentPatternNumber())
-+String(": ")
-+String(routineNames[getCurrentPatternNumber()])
-+String("</td></tr>")
-+String("<tr><td>Brightness (0-10)</td><td>")
-+String(brightness)
-+String("</td></tr>")
-+String("<tr style=\"color:rgb(")
-+String(color[0])
-+String(",")
-+String(color[1])
-+String(",")
-+String(color[2])
-+String(");\"><td>Selected Color</td><td>(")
-+String(color[0])
-+String(",")
-+String(color[1])
-+String(",")
-+String(color[2])
-+String(")</td></tr>")
-+String("<tr><td>Motion</td><td>");
-if (motionDetected) {
-  controlPanelHTML += String("Motion Detected");
-} else {
-  controlPanelHTML +=String("No Motion for ")
-  +String(((millis() - motionLastDetected)/3600000)/1000)
-  +String("h ")
-  +String((((millis() - motionLastDetected)%3600000)/60)/1000)
-  +String("m " )
-  +String(((millis() - motionLastDetected)%60000)/1000)
-  +String("s ");
-}
-controlPanelHTML += String("</td></tr>")
-+String("</tbody></table></div>")
-+String("</div></body></html>");
+  +String("<div class=\"row\"><div class=\"col-xs-12\"><div class=\"btn-group btn-group-lg\" role=\"group\" aria-label=\"Control Panel\">");
+  if (currentDisplayMode == off) {
+    controlPanelHTML +=String("<a href=\"/mode/on\"><button type=\"button\" class=\"btn btn-success\">TURN ON</button></a>");
+  } else {
+    controlPanelHTML +=String("<a href=\"/mode/off\"><button type=\"button\" class=\"btn btn-danger\">TURN OFF</button></a>");
+  } 
+  controlPanelHTML +=String("<a href=\"/mode/change\"><button type=\"button\" class=\"btn btn-primary\">CHANGE MODE</button></a>")
+  +String("<a href=\"/routine/up\"><button type=\"button\" class=\"btn btn-primary\">NEXT ROUTINE</button></a>")
+  +String("<a href=\"/routine/down\"><button type=\"button\" class=\"btn btn-primary\">PREVIOUS ROUTINE</button></a>")
+  +String("<a href=\"/brightness/up\"><button type=\"button\" class=\"btn btn-primary\">BRIGHTNESS UP</button></a>")
+  +String("<a href=\"/brightness/down\"><button type=\"button\" class=\"btn btn-primary\">BRIGHTNESS DOWN</button></a>")
+  +String("</div></div></div>")
+  +String("<div class=\"row\"><table class=\"table table-dark\"><thead><tr><th scope=\"col\">Setting</th><th scope=\"col\">Status</th></tr></thead><tbody><tr><td>Mode</td><td>")
+  +String(getDisplayModeText())
+  +String("</td></tr><tr><td>Displaying Routine</td><td>#")
+  +String(getCurrentPatternNumber())
+  +String(": ")
+  +String(routineNames[getCurrentPatternNumber()])
+  +String("</td></tr>")
+  +String("<tr><td>Brightness (0-10)</td><td>")
+  +String(brightness)
+  +String("</td></tr>")
+  +String("<tr style=\"color:rgb(")
+  +String(color[0])
+  +String(",")
+  +String(color[1])
+  +String(",")
+  +String(color[2])
+  +String(");\"><td>Selected Color</td><td>(")
+  +String(color[0])
+  +String(",")
+  +String(color[1])
+  +String(",")
+  +String(color[2])
+  +String(")</td></tr>")
+  +String("<tr><td>Motion</td><td>");
+  if (motionDetected) {
+    controlPanelHTML += String("Motion Detected");
+  } else {
+    controlPanelHTML +=String("No Motion for ")
+    +String(((millis() - motionLastDetected)/3600000)/1000)
+    +String("h ")
+    +String((((millis() - motionLastDetected)%3600000)/60)/1000)
+    +String("m " )
+    +String(((millis() - motionLastDetected)%60000)/1000)
+    +String("s ");
+  }
+  controlPanelHTML += String("</td></tr>")
+  +String("</tbody></table></div>")
+  +String("</div></body></html>");
+  #ifdef DEBUG3
+    prntln("Done generating new control panel HTML");
+  #endif
 }
 
 void handleRequest(String header) {

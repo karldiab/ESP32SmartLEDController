@@ -145,7 +145,7 @@ void pride()
 // Overall twinkle density.
 // 0 (NONE lit) to 8 (ALL lit at once).  
 // Default is 5.
-#define TWINKLE_DENSITY 5
+#define TWINKLE_DENSITY 4
 // Background color for 'unlit' pixels
 // Can be set to CRGB::Black if desired.
 CRGB gBackgroundColor = CRGB::Black; 

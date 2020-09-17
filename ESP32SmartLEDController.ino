@@ -2,6 +2,7 @@
 #define DEBUG2 1
 //#define DEBUG3 1
 //#define DEBUG5 1
+//#define WEB_SERVER 1
 #define IR_RECEIVE_PIN 13
 #define MOTION_PIN 27
 //LED Strip driver definitions
@@ -41,7 +42,9 @@ bool colorManuallySelected = false;
 #include "LEDDriver.h"
 #include "DisplayDriver.h"
 #include "IRReceiver.h"
-#include "WebServer.h"
+#ifdef WEB_SERVER
+  #include "WebServer.h"
+#endif
 
 
 //create task to drive LEDs to run on second core
@@ -85,8 +88,10 @@ void setup(void) {
   timerAlarmEnable(myTimer);
   //for lcd
   setupDisplay();
+  #ifdef WEB_SERVER
+    webServerSetup();
+  #endif
 
-  webServerSetup();
 
   //ir receiver
   irrecv.enableIRIn();  // Start the receiver
@@ -107,6 +112,8 @@ int counter = 0;
 void loop() {
   //update display if its been long enough
   updateDisplay();
-
-  webServerLoop();
+  #ifdef WEB_SERVER
+    webServerLoop();
+  #endif
+  
 }

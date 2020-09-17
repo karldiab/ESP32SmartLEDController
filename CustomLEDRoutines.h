@@ -94,7 +94,7 @@ void pulseStairs() {
         //int ledBrightness = 
         //double brightnessFactor = mapf(color
         double brightnessFactor = calculateCosWaveformFactor(led,wavePosition, pulseStairsFrameNumber, PULSE_STAIRS_TOTAL_FRAMES, PULSE_STAIRS_WAVE_WIDTH, stair);
-        leds[myLEDIndex].setRGB((int)((double)color[0]*brightnessFactor+0.5),(int)((double)color[1]*brightnessFactor+0.5),(int)((double)color[2]*brightnessFactor+0.5)); 
+        leds[myLEDIndex].setRGB((int)((double)color[0]*brightnessFactor),(int)((double)color[1]*brightnessFactor),(int)((double)color[2]*brightnessFactor)); 
       #ifdef DEBUG5
         if (stair == 1 || stair == 0) {
           Serial.print("stair: ");

@@ -13,12 +13,10 @@ uint8_t randomHue = random(256);
 #include "CustomLEDRoutines.h"
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
+//SimplePatternList gPatterns = { pulseStairs, twinkle };
+//String routineNames[] = { "Pulse Stairs", "Twinkle" };
 SimplePatternList gPatterns = { pulseStairs, rainbowWithGlitter, redCarpetLoop, pulse,  confetti, sinelon, juggle, bpm, twinkle, runRainbow };
 String routineNames[] = { "Pulse Stairs", "GLTR Rainbow",  "Red Carpet", "Pulse", "Confetti", "Sinelon", "Juggle", "BPM", "Twinkle", "Step Rainbow" };
-//SimplePatternList gPatterns = { pulseStairs, pride, rainbow, redCarpetLoop, rainbowWithGlitter, confetti, sinelon, juggle, bpm, twinkle, runRainbow };
-//String routineNames[] = { "Pulse Stairs", "Pride", "Rainbow", "Red Carpet", "GLTR Rainbow", "Confetti", "Sinelon", "Juggle", "BPM", "Twinkle", "Step Rainbow" };
-//SimplePatternList gPatterns = { pride, rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm, twinkle};
-//String routineNames[] = { "Pride", "Rainbow", "GLTR Rainbow", "Confetti", "Sinelon", "Juggle", "BPM", "Twinkle"};
 //SimplePatternList gPatterns = { pulse };
 //String routineNames[] = { "pulse" };
 void nextPattern()
