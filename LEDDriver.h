@@ -15,8 +15,8 @@ uint8_t randomHue = random(256);
 typedef void (*SimplePatternList[])();
 //SimplePatternList gPatterns = { pulseStairs, twinkle };
 //String routineNames[] = { "Pulse Stairs", "Twinkle" };
-SimplePatternList gPatterns = { pulseStairs, rainbowWithGlitter, redCarpetLoop, pulse,  confetti, sinelon, juggle, bpm, twinkle, runRainbow };
-String routineNames[] = { "Pulse Stairs", "GLTR Rainbow",  "Red Carpet", "Pulse", "Confetti", "Sinelon", "Juggle", "BPM", "Twinkle", "Step Rainbow" };
+SimplePatternList gPatterns = { fire, pulseStairs, rainbowWithGlitter, redCarpetLoop, pulse,  confetti, sinelon, juggle, bpm, twinkle, runRainbow };
+String routineNames[] = { "Fire", "Pulse Stairs", "GLTR Rainbow",  "Red Carpet", "Pulse", "Confetti", "Sinelon", "Juggle", "BPM", "Twinkle", "Step Rainbow" };
 //SimplePatternList gPatterns = { pulse };
 //String routineNames[] = { "pulse" };
 void nextPattern()
