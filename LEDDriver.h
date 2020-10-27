@@ -13,8 +13,10 @@ uint8_t randomHue = random(256);
 #include "CustomLEDRoutines.h"
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { fire, pacifica, pulseStairs, rainbowWithGlitter, redCarpetLoop, pulse,  fire, pacifica ,confetti, sinelon, juggle, bpm, twinkle, runRainbow };
-String routineNames[] = { "Fire", "Pacifica", "Pulse Stairs", "GLTR Rainbow",  "Red Carpet", "Pulse", "Fire", "Pacifica","Confetti", "Sinelon", "Juggle", "BPM", "Twinkle", "Step Rainbow" };
+SimplePatternList gPatterns = { pacifica,pacifica, fire, sinelon, rainbowWithGlitter, twinkle,pulse,  fire, pacifica ,pacifica,confetti, sinelon, juggle, bpm, twinkle,twinkle,twinkle};
+String routineNames[] = { "Pacifica","Pacifica", "Fire", "Sinelon", "GLTR Rainbow", "Twinkle", "Pulse", "Fire", "Pacifica","Pacifica","Confetti", "Sinelon", "Juggle", "BPM", "Twinkle","Twinkle","Twinkle"};
+//SimplePatternList gPatterns = { fire, pacifica,pacifica, pulseStairs, rainbowWithGlitter, twinkle,redCarpetLoop, pulse,  fire, pacifica ,pacifica,confetti, sinelon, juggle, bpm, twinkle,twinkle,twinkle, runRainbow };
+//String routineNames[] = { "Fire", "Pacifica","Pacifica", "Pulse Stairs", "GLTR Rainbow", "Twinkle", "Red Carpet", "Pulse", "Fire", "Pacifica","Pacifica","Confetti", "Sinelon", "Juggle", "BPM", "Twinkle","Twinkle","Twinkle", "Step Rainbow" };
 //SimplePatternList gPatterns = { pacifica, fire, pulseStairs, rainbowWithGlitter, redCarpetLoop, pulse,  confetti, sinelon, juggle, bpm, twinkle, runRainbow };
 //String routineNames[] = { "Pacifica", "Fire", "Pulse Stairs", "GLTR Rainbow",  "Red Carpet", "Pulse", "Confetti", "Sinelon", "Juggle", "BPM", "Twinkle", "Step Rainbow" };
 //SimplePatternList gPatterns = { pulse };

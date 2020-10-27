@@ -1,14 +1,15 @@
 #define DEBUG 1
 #define DEBUG2 1
-//#define DEBUG3 1
+#define DEBUG3 1
 //#define DEBUG5 1
 //#define WEB_SERVER 1
+//#define ENABLE_DISPLAY 1
 #define IR_RECEIVE_PIN 13
 #define MOTION_PIN 27
 //LED Strip driver definitions
 #define LED_TYPE    WS2811
 #define COLOR_ORDER BRG
-#define LED_COUNT 191
+#define LED_COUNT 216
 #define LED_PIN    12
 #define FRAMES_PER_SECOND  120
 #define MAX_BRIGHTNESS_VALUE 10
@@ -40,7 +41,9 @@ bool colorManuallySelected = false;
 
 #include "UtilityFunctions.h"
 #include "LEDDriver.h"
-#include "DisplayDriver.h"
+#ifdef ENABLE_DISPLAY
+  #include "DisplayDriver.h"
+#endif
 #include "IRReceiver.h"
 #ifdef WEB_SERVER
   #include "WebServer.h"
@@ -87,7 +90,9 @@ void setup(void) {
   timerAlarmWrite(myTimer, 150000, true);
   timerAlarmEnable(myTimer);
   //for lcd
-  setupDisplay();
+  #ifdef ENABLE_DISPLAY
+    setupDisplay();
+  #endif
   #ifdef WEB_SERVER
     webServerSetup();
   #endif
@@ -110,8 +115,10 @@ void setup(void) {
 }
 int counter = 0;
 void loop() {
-  //update display if its been long enough
-  updateDisplay();
+  #ifdef ENABLE_DISPLAY
+    //update display if its been long enough
+    updateDisplay();
+  #endif
   #ifdef WEB_SERVER
     webServerLoop();
   #endif
